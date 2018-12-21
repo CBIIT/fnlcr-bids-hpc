@@ -1,3 +1,8 @@
+* [Home](https://cbiit.github.io/fnlcr-bids-hpc)
+  * Image segmentation
+
+---
+
 # Post-processing
 
 ## metrics_and_plots-driver.sh
