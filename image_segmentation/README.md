@@ -1,5 +1,5 @@
 * [Home](https://cbiit.github.io/fnlcr-bids-hpc)
-  * Image segmentation
+  * **Image segmentation**
 
 ---
 
