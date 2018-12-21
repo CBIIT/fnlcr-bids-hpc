@@ -109,7 +109,7 @@ In this documentation we assume the data are 3D so that N, H, and W actually cor
 
 ### Call format
  
-```bash
+```
 $IMAGE_SEG/metrics_and_plots-driver.sh <MODELS> <ROI-NUMBERS> <NINFERENCES> <CALCULATE-METRICS> <CREATE-PLOTS> <MOVIE-DIRECTORY> <NFRAMES> <FRAMERATE>
 ```
 
