@@ -9,7 +9,7 @@ In this documentation we assume the data are 3D so that N, H, and W actually cor
 ### Setup
 
 1. Check out the current repository and set the variable IMAGE_SEG to where the image_segmentation directory is located, e.g.,
-  * `IMAGE_SEG=/Users/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation`
+   `IMAGE_SEG=/Users/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation`
 2. In some working directory, place .npy files (or symbolic links to them) containing the images and masks for the ROIs in the format `roiX_input_img.npy` and `known_masks_roiX.npy`, where X is an integer (1, 2, 3, etc.).
 3. In the same working directory, create a directory with the model name for each model containing inference results.
 4. In each model directory, place .npy files (or symbolic links to them) containing the inferred masks on the ROIs in the format inferred_masks-roiX-Y_first.npy, where X corresponds to the ROI on which inference was done and Y takes on the values x, y, or z and refers to the direction orthogonal to which the 2D inferences were performed.  E.g., if inference on the i-th image in the NxHxW stack is specified by img(i,:,:), then Y would be set to z due to the correspondence (N,H,W) <--> (z,y,x).  Similarly, Y would be set to y if inference were done on the j-th image specified by img(:,j,:), and Y would be set to x if inference were done on the k-th image specified by img(:,:,k).  As noted above, if the images in the stack are not correlated in space and only a since inference is done, Y should always be set to z.
