@@ -9,9 +9,8 @@ In this documentation we assume the data are 3D so that N, H, and W actually cor
 ### Setup
 
 1. Check out the current repository and set the variable IMAGE_SEG to where the image_segmentation directory is located, e.g.,
-```bash
-IMAGE_SEG=/Users/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation
-```
+
+  * `IMAGE_SEG=/Users/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation`
 
 1. In some working directory, place .npy files (or symbolic links to them) containing the images and masks for the ROIs in the format `roiX_input_img.npy` and `known_masks_roiX.npy`, where X is an integer (1, 2, 3, etc.).
 
