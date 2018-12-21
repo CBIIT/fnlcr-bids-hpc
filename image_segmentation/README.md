@@ -127,7 +127,7 @@ where
 6. `<MOVIE-DIRECTORY>` is the name of the directory in which you want to place movies of the plots throughout the stacks, e.g., `movies`
 
    * Note: This directory will be created if it does not exist
-7. `<NFRAMES>` is the number of frames in each movie (can't be larger than the stack size), e.g., `40`
+7. `<NFRAMES>` is the number of frames in each movie (shouldn't be larger than the stack size), e.g., `40`
 8. `<FRAMERATE>` is the framerate of the movies in frames per second, e.g., `2`
 
 #### Sample calls
@@ -151,4 +151,4 @@ $IMAGE_SEG/metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi
 
 ## metrics_and_plots.py
 
-This file is called by metrics_and_plots-driver.sh and need not be called directly.
+This file is called by metrics_and_plots-driver.sh and need not be called explicitly.
