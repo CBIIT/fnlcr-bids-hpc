@@ -19,7 +19,7 @@ In this documentation we assume the data are 3D so that N, H, and W actually cor
 
    *Explicit example of directory structure for spatially correlated images:*
 
-```
+   ```
 ├── 01-roi1_only_uncombined_unet
 │   ├── inferred_masks-roi1-x_first.npy
 │   ├── inferred_masks-roi1-y_first.npy
@@ -80,7 +80,7 @@ In this documentation we assume the data are 3D so that N, H, and W actually cor
 
    *Explicit example of directory structure for spatially uncorrelated images:*
 
-```
+   ```
 ├── 01-roi1_only_uncombined_unet
 │   ├── inferred_masks-roi1-z_first.npy
 │   ├── inferred_masks-roi2-z_first.npy
