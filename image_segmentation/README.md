@@ -15,7 +15,7 @@ In this documentation we assume the data are 3D so that N, H, and W actually cor
 3. In the same working directory, create a directory with the model name for each model containing inference results.
 4. In each model directory, place .npy files (or symbolic links to them) containing the inferred masks on the ROIs in the format `inferred_masks-roiX-Y_first.npy`, where X corresponds to the ROI on which inference was done and Y takes on the values x, y, or z and refers to the direction orthogonal to which the 2D inferences were performed.
 
-   For example, if inference on the i-th image in the NxHxW stack is specified by img(i,:,:), then Y would be set to z due to the correspondence (N,H,W) <--> (z,y,x).  Similarly, Y would be set to y if inference were done on the j-th image specified by img(:,j,:), and Y would be set to x if inference were done on the k-th image specified by img(:,:,k).  As noted above, if the images in the stack are not correlated in space and only a since inference is done, Y should always be set to z for the single inference file per ROI per model.
+   For example, if inference on the i-th image in the NxHxW stack is specified by img(i,:,:), then Y would be set to z due to the correspondence (N,H,W) <--> (z,y,x).  Similarly, Y would be set to y if inference were done on the j-th image specified by img(:,j,:), and Y would be set to x if inference were done on the k-th image specified by img(:,:,k).  As noted above, if the images in the stack are not correlated in space and only a single inference is done, Y should always be set to z for the single inference file per ROI per model.
 
 *Explicit example of directory structure for spatially correlated images:*
 
