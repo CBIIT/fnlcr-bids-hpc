@@ -11,7 +11,7 @@ In this documentation we assume the data are 3D so that N, H, and W actually cor
 1. Check out the current repository and set the variable IMAGE_SEG to where the image_segmentation directory is located, e.g.,
 
    `IMAGE_SEG=/Users/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation`
-2. In some working directory, place .npy files (or symbolic links to them) containing the images and masks for the ROIs in the format `roiX_input_img.npy` and `known_masks_roiX.npy`, where X is an integer (1, 2, 3, etc.).
+2. In some working directory, place .npy files (or symbolic links to them) containing the images and true masks for the ROIs in the format `roiX_input_img.npy` and `known_masks_roiX.npy`, where X is an integer (1, 2, 3, etc.).
 3. In the same working directory, create a directory with the model name for each model containing inference results.
 4. In each model directory, place .npy files (or symbolic links to them) containing the inferred masks on the ROIs in the format `inferred_masks-roiX-Y_first.npy`, where X corresponds to the ROI on which inference was done and Y takes on the values x, y, or z and refers to the direction orthogonal to which the 2D inferences were performed.
 
