@@ -52,6 +52,7 @@ def calculate_metrics(msk0,msk1,only2D=False):
 
 def process_data_for_view(view_transpose_index,inference_on_dir,roi_num,model): # order of parameters here is view, inference direction, ROI
 
+    # Import relevant modules
     import my_module as utils
     import numpy as np
     
@@ -92,6 +93,7 @@ def process_data_for_view(view_transpose_index,inference_on_dir,roi_num,model): 
     return(msk0,shp,img,msk1,img_rgba,msk0_rgba,msk1_rgba,metrics_2d,metrics_3d)
 
 def get_colored_str(x):
+    # Get HTML string that colors x according to its value so the table is colored
     col = 'black'
     if x >= 95:
         col = 'green'
@@ -109,24 +111,32 @@ import matplotlib.pyplot as plt
 import os
 import sys
 
-# Constants
-my_fig_size = (16,9)
-nframes = 40
-roi_nums = [1,2,3]
-inferences_on_dir = ['z','x','y']
-views = [0,1,2]
-legend_arr = ['true positive rate / sensitivity / recall','true negative rate / specificity / selectivity','positive predictive value / precision','balanced accuracy','f1 score']
-
 # Process the parameters
 model_name = sys.argv[1]
-produce_metrics = bool(int(sys.argv[2]))
-produce_plots = bool(int(sys.argv[3]))
+roi_nums = eval(sys.argv[2])
+ninf = int(sys.argv[3])
+calculate_metrics = bool(int(sys.argv[4]))
+create_plots = bool(int(sys.argv[5]))
+nframes = int(sys.argv[6])
+
+# Variables
+if ninf == 3:
+    inferences_on_dir = ['z','x','y']
+    views = [0,1,2]
+    my_fig_size = (16,9)
+else:
+    inferences_on_dir = ['z']
+    views = [0]
+    my_fig_size = (6,9)
+
+# Constant
+legend_arr = ['true positive rate / sensitivity / recall','true negative rate / specificity / selectivity','positive predictive value / precision','balanced accuracy','f1 score']
 
 # Variable
 ax_dict = dict(zip(inferences_on_dir,views))
 
 # Open the file for writing the metrics if we're going to be writing them
-if produce_metrics:
+if calculate_metrics:
     file = open('3d_metrics.txt','a')
     
 # For each ROI...
@@ -138,95 +148,107 @@ for roi_num in roi_nums:
         view2 = inferences_on_dir[view]
     
         # Load the process the data for each view for each ROI (note that each image has different inference directions)
-        msk0_z,shp_z,img_z,msk1_z,img_rgba_z,msk0_rgba_z,msk1_rgba_z,metrics_2d_z,metrics_3d_z = process_data_for_view(view,'z',roi_num,model_name) # these are named _x, _y, _z in name only for an older type of plot
-        msk0_x,shp_x,img_x,msk1_x,img_rgba_x,msk0_rgba_x,msk1_rgba_x,metrics_2d_x,metrics_3d_x = process_data_for_view(view,'x',roi_num,model_name)
-        msk0_y,shp_y,img_y,msk1_y,img_rgba_y,msk0_rgba_y,msk1_rgba_y,metrics_2d_y,metrics_3d_y = process_data_for_view(view,'y',roi_num,model_name)
-        labels = ['view_'+view2+'-inf_dir_'+'z'+'-roi'+str(roi_num),'view_'+view2+'-inf_dir_'+'x'+'-roi'+str(roi_num),'view_'+view2+'-inf_dir_'+'y'+'-roi'+str(roi_num)]
+        msk0_left,shp_left,img_left,msk1_left,img_rgba_left,msk0_rgba_left,msk1_rgba_left,metrics_2d_left,metrics_3d_left = process_data_for_view(view,'z',roi_num,model_name) # these are named _x, _y, _z in name only for an older type of plot
+        if ninf == 3:
+            msk0_middle,shp_middle,img_middle,msk1_middle,img_rgba_middle,msk0_rgba_middle,msk1_rgba_middle,metrics_2d_middle,metrics_3d_middle = process_data_for_view(view,'x',roi_num,model_name)
+            msk0_right,shp_right,img_right,msk1_right,img_rgba_right,msk0_rgba_right,msk1_rgba_right,metrics_2d_right,metrics_3d_right = process_data_for_view(view,'y',roi_num,model_name)
+            labels = ['view_'+view2+'-inf_dir_'+'z'+'-roi'+str(roi_num),'view_'+view2+'-inf_dir_'+'x'+'-roi'+str(roi_num),'view_'+view2+'-inf_dir_'+'y'+'-roi'+str(roi_num)]
+        else:
+            labels = ['view_'+view2+'-inf_dir_'+'z'+'-roi'+str(roi_num)]
         dirname = model_name+'/movie-roi'+str(roi_num)+'_view_'+view2
 
         # Write the metrics if desired
-        if produce_metrics:
+        if calculate_metrics:
             if new_view:
-                file.write(str(int(model_name.split('-',1)[0]))+'\t'+str(ax_dict[labels[0].split('inf_dir_',1)[1].split('-roi',1)[0]])+'\t'+str(roi_num)+'\t'+str(metrics_3d_z).replace('[','').replace(']','')+'\n')
-                file.write(str(int(model_name.split('-',1)[0]))+'\t'+str(ax_dict[labels[1].split('inf_dir_',1)[1].split('-roi',1)[0]])+'\t'+str(roi_num)+'\t'+str(metrics_3d_x).replace('[','').replace(']','')+'\n')
-                file.write(str(int(model_name.split('-',1)[0]))+'\t'+str(ax_dict[labels[2].split('inf_dir_',1)[1].split('-roi',1)[0]])+'\t'+str(roi_num)+'\t'+str(metrics_3d_y).replace('[','').replace(']','')+'\n')
+                file.write(str(int(model_name.split('-',1)[0]))+'\t'+str(ax_dict[labels[0].split('inf_dir_',1)[1].split('-roi',1)[0]])+'\t'+str(roi_num)+'\t'+str(metrics_3d_left).replace('[','').replace(']','')+'\n')
+                if ninf == 3:
+                    file.write(str(int(model_name.split('-',1)[0]))+'\t'+str(ax_dict[labels[1].split('inf_dir_',1)[1].split('-roi',1)[0]])+'\t'+str(roi_num)+'\t'+str(metrics_3d_middle).replace('[','').replace(']','')+'\n')
+                    file.write(str(int(model_name.split('-',1)[0]))+'\t'+str(ax_dict[labels[2].split('inf_dir_',1)[1].split('-roi',1)[0]])+'\t'+str(roi_num)+'\t'+str(metrics_3d_right).replace('[','').replace(']','')+'\n')
 
         # If we want to create plots of the data...
-        if produce_plots:
+        if create_plots:
         
             # First plot the frame-independent data and metrics
             myfig = plt.figure(figsize=my_fig_size) # interestingly you must initialize figsize here in order to make later calls to myfig.set_figwidth(X) work
-            ax1 = plt.subplot(2,3,0+1)
-            ax2 = plt.subplot(2,3,0+4)
+            ax1 = plt.subplot(2,ninf,0+1)
+            ax2 = plt.subplot(2,ninf,0+ninf+1)
             ax1.set_title(labels[0])
-            ax3 = plt.subplot(2,3,1+1)
-            ax4 = plt.subplot(2,3,1+4)
-            ax3.set_title(labels[1])
-            ax5 = plt.subplot(2,3,2+1)
-            ax6 = plt.subplot(2,3,2+4)
-            ax5.set_title(labels[2])
-            ax2.plot(np.transpose(metrics_2d_z))
-            ax2.set_xlim(0,shp_z[0]-1)
+            ax2.plot(np.transpose(metrics_2d_left))
+            ax2.set_xlim(0,shp_left[0]-1)
             ax2.set_ylim(0,1)
-            ax2.set_xlabel('3D stats: tpr='+'{:04.2f}'.format(metrics_3d_z[0])+', tnr='+'{:04.2f}'.format(metrics_3d_z[1])+', ppv='+'{:04.2f}'.format(metrics_3d_z[2])+', bacc='+'{:04.2f}'.format(metrics_3d_z[3])+', f1='+'{:04.2f}'.format(metrics_3d_z[4]))
+            ax2.set_xlabel('3D stats: tpr='+'{:04.2f}'.format(metrics_3d_left[0])+', tnr='+'{:04.2f}'.format(metrics_3d_left[1])+', ppv='+'{:04.2f}'.format(metrics_3d_left[2])+', bacc='+'{:04.2f}'.format(metrics_3d_left[3])+', f1='+'{:04.2f}'.format(metrics_3d_left[4]))
             ax2.set_ylabel(model_name)
             ax2.legend(legend_arr,loc='lower left')
-            ax4.plot(np.transpose(metrics_2d_x))
-            ax4.set_xlim(0,shp_x[0]-1)
-            ax4.set_ylim(0,1)
-            ax4.set_xlabel('3D stats: tpr='+'{:04.2f}'.format(metrics_3d_x[0])+', tnr='+'{:04.2f}'.format(metrics_3d_x[1])+', ppv='+'{:04.2f}'.format(metrics_3d_x[2])+', bacc='+'{:04.2f}'.format(metrics_3d_x[3])+', f1='+'{:04.2f}'.format(metrics_3d_x[4]))
-            ax4.legend(legend_arr,loc='lower left')
-            ax6.plot(np.transpose(metrics_2d_y))
-            ax6.set_xlim(0,shp_y[0]-1)
-            ax6.set_ylim(0,1)
-            ax6.set_xlabel('3D stats: tpr='+'{:04.2f}'.format(metrics_3d_y[0])+', tnr='+'{:04.2f}'.format(metrics_3d_y[1])+', ppv='+'{:04.2f}'.format(metrics_3d_y[2])+', bacc='+'{:04.2f}'.format(metrics_3d_y[3])+', f1='+'{:04.2f}'.format(metrics_3d_y[4]))
-            ax6.legend(legend_arr,loc='lower left')
-            #os.mkdir(dirname)
+            if ninf == 3:
+                ax3 = plt.subplot(2,ninf,1+1)
+                ax4 = plt.subplot(2,ninf,1+ninf+1)
+                ax3.set_title(labels[1])
+                ax5 = plt.subplot(2,ninf,2+1)
+                ax6 = plt.subplot(2,ninf,2+ninf+1)
+                ax5.set_title(labels[2])
+                ax4.plot(np.transpose(metrics_2d_middle))
+                ax4.set_xlim(0,shp_middle[0]-1)
+                ax4.set_ylim(0,1)
+                ax4.set_xlabel('3D stats: tpr='+'{:04.2f}'.format(metrics_3d_middle[0])+', tnr='+'{:04.2f}'.format(metrics_3d_middle[1])+', ppv='+'{:04.2f}'.format(metrics_3d_middle[2])+', bacc='+'{:04.2f}'.format(metrics_3d_middle[3])+', f1='+'{:04.2f}'.format(metrics_3d_middle[4]))
+                ax4.legend(legend_arr,loc='lower left')
+                ax6.plot(np.transpose(metrics_2d_right))
+                ax6.set_xlim(0,shp_right[0]-1)
+                ax6.set_ylim(0,1)
+                ax6.set_xlabel('3D stats: tpr='+'{:04.2f}'.format(metrics_3d_right[0])+', tnr='+'{:04.2f}'.format(metrics_3d_right[1])+', ppv='+'{:04.2f}'.format(metrics_3d_right[2])+', bacc='+'{:04.2f}'.format(metrics_3d_right[3])+', f1='+'{:04.2f}'.format(metrics_3d_right[4]))
+                ax6.legend(legend_arr,loc='lower left')
             if not os.path.exists(dirname):
                 os.mkdir(dirname)
 
             # Now plot the frame-dependent data and metrics
-            frames_z = np.linspace(0,shp_z[0]-1,num=nframes).astype('uint16')
-            frames_x = np.linspace(0,shp_x[0]-1,num=nframes).astype('uint16')
-            frames_y = np.linspace(0,shp_y[0]-1,num=nframes).astype('uint16')
+            frames_left = np.linspace(0,shp_left[0]-1,num=nframes).astype('uint16')
+            if ninf == 3:
+                frames_middle = np.linspace(0,shp_middle[0]-1,num=nframes).astype('uint16')
+                frames_right = np.linspace(0,shp_right[0]-1,num=nframes).astype('uint16')
             iframe = 0
-            for frame2plot_z,frame2plot_x,frame2plot_y in zip(frames_z,frames_x,frames_y):
+            while iframe < nframes:
+            #for frame2plot_left,frame2plot_middle,frame2plot_right in zip(frames_left,frames_middle,frames_right):
+                frame2plot_left = frames_left[iframe]
+                if ninf == 3:
+                    frame2plot_middle = frames_middle[iframe]
+                    frame2plot_right = frames_right[iframe]
                 iframe += 1
-                ax2.set_title('tpr='+'{:04.2f}'.format(metrics_2d_z[0,frame2plot_z])+' tnr='+'{:04.2f}'.format(metrics_2d_z[1,frame2plot_z])+' ppv='+'{:04.2f}'.format(metrics_2d_z[2,frame2plot_z])+' bacc='+'{:04.2f}'.format(metrics_2d_z[3,frame2plot_z])+' f1='+'{:04.2f}'.format(metrics_2d_z[4,frame2plot_z]))
-                ax4.set_title('tpr='+'{:04.2f}'.format(metrics_2d_x[0,frame2plot_x])+' tnr='+'{:04.2f}'.format(metrics_2d_x[1,frame2plot_x])+' ppv='+'{:04.2f}'.format(metrics_2d_x[2,frame2plot_x])+' bacc='+'{:04.2f}'.format(metrics_2d_x[3,frame2plot_x])+' f1='+'{:04.2f}'.format(metrics_2d_x[4,frame2plot_x]))
-                ax6.set_title('tpr='+'{:04.2f}'.format(metrics_2d_y[0,frame2plot_y])+' tnr='+'{:04.2f}'.format(metrics_2d_y[1,frame2plot_y])+' ppv='+'{:04.2f}'.format(metrics_2d_y[2,frame2plot_y])+' bacc='+'{:04.2f}'.format(metrics_2d_y[3,frame2plot_y])+' f1='+'{:04.2f}'.format(metrics_2d_y[4,frame2plot_y]))
-                im1_z = ax1.imshow(img_rgba_z[frame2plot_z,:,:,:])
-                im2_z = ax1.imshow(msk0_rgba_z[frame2plot_z,:,:,:])
-                im3_z = ax1.imshow(msk1_rgba_z[frame2plot_z,:,:,:])
-                sct_z = ax2.scatter([frame2plot_z,frame2plot_z,frame2plot_z,frame2plot_z,frame2plot_z],metrics_2d_z[:,frame2plot_z],c=['C0','C1','C2','C3','C4'])
-                im1_x = ax3.imshow(img_rgba_x[frame2plot_x,:,:,:])
-                im2_x = ax3.imshow(msk0_rgba_x[frame2plot_x,:,:,:])
-                im3_x = ax3.imshow(msk1_rgba_x[frame2plot_x,:,:,:])
-                sct_x = ax4.scatter([frame2plot_x,frame2plot_x,frame2plot_x,frame2plot_x,frame2plot_x],metrics_2d_x[:,frame2plot_x],c=['C0','C1','C2','C3','C4'])
-                im1_y = ax5.imshow(img_rgba_y[frame2plot_y,:,:,:])
-                im2_y = ax5.imshow(msk0_rgba_y[frame2plot_y,:,:,:])
-                im3_y = ax5.imshow(msk1_rgba_y[frame2plot_y,:,:,:])
-                sct_y = ax6.scatter([frame2plot_y,frame2plot_y,frame2plot_y,frame2plot_y,frame2plot_y],metrics_2d_y[:,frame2plot_y],c=['C0','C1','C2','C3','C4'])
+                ax2.set_title('tpr='+'{:04.2f}'.format(metrics_2d_left[0,frame2plot_left])+' tnr='+'{:04.2f}'.format(metrics_2d_left[1,frame2plot_left])+' ppv='+'{:04.2f}'.format(metrics_2d_left[2,frame2plot_left])+' bacc='+'{:04.2f}'.format(metrics_2d_left[3,frame2plot_left])+' f1='+'{:04.2f}'.format(metrics_2d_left[4,frame2plot_left]))
+                im1_left = ax1.imshow(img_rgba_left[frame2plot_left,:,:,:])
+                im2_left = ax1.imshow(msk0_rgba_left[frame2plot_left,:,:,:])
+                im3_left = ax1.imshow(msk1_rgba_left[frame2plot_left,:,:,:])
+                sct_left = ax2.scatter([frame2plot_left,frame2plot_left,frame2plot_left,frame2plot_left,frame2plot_left],metrics_2d_left[:,frame2plot_left],c=['C0','C1','C2','C3','C4'])
+                if ninf == 3:
+                    ax4.set_title('tpr='+'{:04.2f}'.format(metrics_2d_middle[0,frame2plot_middle])+' tnr='+'{:04.2f}'.format(metrics_2d_middle[1,frame2plot_middle])+' ppv='+'{:04.2f}'.format(metrics_2d_middle[2,frame2plot_middle])+' bacc='+'{:04.2f}'.format(metrics_2d_middle[3,frame2plot_middle])+' f1='+'{:04.2f}'.format(metrics_2d_middle[4,frame2plot_middle]))
+                    ax6.set_title('tpr='+'{:04.2f}'.format(metrics_2d_right[0,frame2plot_right])+' tnr='+'{:04.2f}'.format(metrics_2d_right[1,frame2plot_right])+' ppv='+'{:04.2f}'.format(metrics_2d_right[2,frame2plot_right])+' bacc='+'{:04.2f}'.format(metrics_2d_right[3,frame2plot_right])+' f1='+'{:04.2f}'.format(metrics_2d_right[4,frame2plot_right]))
+                    im1_middle = ax3.imshow(img_rgba_middle[frame2plot_middle,:,:,:])
+                    im2_middle = ax3.imshow(msk0_rgba_middle[frame2plot_middle,:,:,:])
+                    im3_middle = ax3.imshow(msk1_rgba_middle[frame2plot_middle,:,:,:])
+                    sct_middle = ax4.scatter([frame2plot_middle,frame2plot_middle,frame2plot_middle,frame2plot_middle,frame2plot_middle],metrics_2d_middle[:,frame2plot_middle],c=['C0','C1','C2','C3','C4'])
+                    im1_right = ax5.imshow(img_rgba_right[frame2plot_right,:,:,:])
+                    im2_right = ax5.imshow(msk0_rgba_right[frame2plot_right,:,:,:])
+                    im3_right = ax5.imshow(msk1_rgba_right[frame2plot_right,:,:,:])
+                    sct_right = ax6.scatter([frame2plot_right,frame2plot_right,frame2plot_right,frame2plot_right,frame2plot_right],metrics_2d_right[:,frame2plot_right],c=['C0','C1','C2','C3','C4'])
                 plt.show(block=False)
                 plt.savefig(dirname+'/frame_'+'{:04d}'.format(iframe)+'.png',dpi='figure')
-                if frame2plot_z != frames_z[-1]: # since they should all be together I'm just doing the z
-                    im1_z.set_visible(False)
-                    im2_z.set_visible(False)
-                    im3_z.set_visible(False)
-                    sct_z.set_visible(False)
-                    im1_x.set_visible(False)
-                    im2_x.set_visible(False)
-                    im3_x.set_visible(False)
-                    sct_x.set_visible(False)
-                    im1_y.set_visible(False)
-                    im2_y.set_visible(False)
-                    im3_y.set_visible(False)
-                    sct_y.set_visible(False)
+                if frame2plot_left != frames_left[-1]: # since they should all be together I'm just doing the left
+                    im1_left.set_visible(False)
+                    im2_left.set_visible(False)
+                    im3_left.set_visible(False)
+                    sct_left.set_visible(False)
+                    if ninf == 3:
+                        im1_middle.set_visible(False)
+                        im2_middle.set_visible(False)
+                        im3_middle.set_visible(False)
+                        sct_middle.set_visible(False)
+                        im1_right.set_visible(False)
+                        im2_right.set_visible(False)
+                        im3_right.set_visible(False)
+                        sct_right.set_visible(False)
                     
         new_view = False
                 
 # If we've written the metrics, create an HTML table for displaying them
-if produce_metrics:
+if calculate_metrics:
 
     # Close the file
     file.close()
@@ -263,11 +285,22 @@ if produce_metrics:
 
                 # For each datum, get a colored version of it
                 z = get_colored_str(zxy[0])
-                x = get_colored_str(zxy[1])
-                y = get_colored_str(zxy[2])
+                if ninf == 3:
+                    x = get_colored_str(zxy[1])
+                    y = get_colored_str(zxy[2])
 
                 # Print the data for each inference in x,y,z order
-                print(x+y+z+' |',end='')
+                if ninf == 3:
+                    print(x+y+z+' |',end='')
+                else:
+                    print('    '+z+'     |',end='')
 
         # Put a nice big space at the end of the table for the current ROI
         print('',end='\n\n\n')
+
+
+
+
+#  96  97 100  --> 13 spaces
+# 12 spaces for purely numbers
+# nominally will be ----__XX----_
