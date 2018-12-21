@@ -4,7 +4,7 @@
 
 Call this script in order to generate metrics and create plots for evaluating how well your model performs a 2D image segmentation task on particular regions of interest (ROIs) with known masks having two classes: background (0) and foreground (1).  All data should have the dimensions (N,H,W), where N is the number of Height-by-Width images in the stack.
 
-In this documentation we assume the data are 3D so that N, H, and W actually correspond to what we define to be the z, y, and x directions, respectively, and three inferences must therefore be run---one on each direction (spatially correlated images; <NINFERENCES>=3).  However, the N axis can instead correspond to the stack dimension of completely uncorrelated images, in which case inference along only the N axis makes sense (spatially uncorrelated images; <NINFERENCES>=1).  In this case the only .npy files below should have the suffix "-z_first.npy"; there should not be any with the suffixes "-x_first.npy" or "-y_first.npy".
+In this documentation we assume the data are 3D so that N, H, and W actually correspond to what we define to be the z, y, and x directions, respectively, and three inferences must therefore be run---one on each direction (spatially correlated images; `<NINFERENCES>`=3).  However, the N axis can instead correspond to the stack dimension of completely uncorrelated images, in which case inference along only the N axis makes sense (spatially uncorrelated images; `<NINFERENCES>`=1).  In this case the only .npy files below should have the suffix "-z_first.npy"; there should not be any with the suffixes "-x_first.npy" or "-y_first.npy".
 
 ### Setup
 
