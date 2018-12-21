@@ -9,7 +9,6 @@ In this documentation we assume the data are 3D so that N, H, and W actually cor
 ### Setup
 
 1. Check out the current repository and set the variable IMAGE_SEG to where the image_segmentation directory is located, e.g.,
-
 ```bash
 IMAGE_SEG=/Users/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation
 ```
@@ -115,7 +114,7 @@ IMAGE_SEG=/Users/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation
 ### Call format
  
 ```bash
-./metrics_and_plots-driver.sh <MODELS> <ROI-NUMBERS> <NINFERENCES> <CALCULATE-METRICS> <CREATE-PLOTS> <MOVIE-DIRECTORY> <NFRAMES> <FRAMERATE>
+$IMAGE_SEG/metrics_and_plots-driver.sh <MODELS> <ROI-NUMBERS> <NINFERENCES> <CALCULATE-METRICS> <CREATE-PLOTS> <MOVIE-DIRECTORY> <NFRAMES> <FRAMERATE>
 ```
 
 where
@@ -135,19 +134,19 @@ where
 
 ```bash
 # Process the data but don't output anything
-./metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 3 0 0 "" "" ""
+$IMAGE_SEG/metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 3 0 0 "" "" ""
 
 # Output the metrics in 3d_metrics.txt
-./metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 3 1 0 "" "" ""
+$IMAGE_SEG/metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 3 1 0 "" "" ""
 
 # Create plots/movies but don't output metrics
-./metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 3 0 1 /Users/weismanal/notebook/2018-12-12/movies 40 2
+$IMAGE_SEG/metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 3 0 1 /Users/weismanal/notebook/2018-12-12/movies 40 2
 
 # Do both
-./metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 3 1 1 /Users/weismanal/notebook/2018-12-12/movies 40 2
+$IMAGE_SEG/metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 3 1 1 /Users/weismanal/notebook/2018-12-12/movies 40 2
 
 # Do both but for an uncorrelated image stack
-./metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 1 1 1 /Users/weismanal/notebook/2018-12-12/movies 40 2
+$IMAGE_SEG/metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 1 1 1 /Users/weismanal/notebook/2018-12-12/movies 40 2
 ```
 
 ## metrics_and_plots.py
