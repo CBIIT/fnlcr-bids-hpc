@@ -17,9 +17,9 @@ In this documentation we assume the data are 3D so that N, H, and W actually cor
 
    For example, if inference on the i-th image in the NxHxW stack is specified by img(i,:,:), then Y would be set to z due to the correspondence (N,H,W) <--> (z,y,x).  Similarly, Y would be set to y if inference were done on the j-th image specified by img(:,j,:), and Y would be set to x if inference were done on the k-th image specified by img(:,:,k).  As noted above, if the images in the stack are not correlated in space and only a since inference is done, Y should always be set to z for the single inference file per ROI per model.
 
-   *Explicit example of directory structure for spatially correlated images:*
+*Explicit example of directory structure for spatially correlated images:*
 
-   ```
+```
 ├── 01-roi1_only_uncombined_unet
 │   ├── inferred_masks-roi1-x_first.npy
 │   ├── inferred_masks-roi1-y_first.npy
@@ -78,9 +78,9 @@ In this documentation we assume the data are 3D so that N, H, and W actually cor
 ├── roi3_input_img.npy
 ```
 
-   *Explicit example of directory structure for spatially uncorrelated images:*
+*Explicit example of directory structure for spatially uncorrelated images:*
 
-   ```
+```
 ├── 01-roi1_only_uncombined_unet
 │   ├── inferred_masks-roi1-z_first.npy
 │   ├── inferred_masks-roi2-z_first.npy
