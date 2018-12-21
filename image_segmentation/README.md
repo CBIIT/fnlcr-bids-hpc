@@ -116,15 +116,17 @@ $IMAGE_SEG/metrics_and_plots-driver.sh <MODELS> <ROI-NUMBERS> <NINFERENCES> <CAL
 where
 
 1. `<MODELS>` is a whitespace-separated list of model names, i.e., the names of the directories of the models you created containing the inference .npy files
-  * E.g., `"01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet"` or `$(find . -type d -iname "0*" | awk -v FS="./" '{print $2}' | sort)`
-1. `<ROI-NUMBERS>` is a Python-formatted array of the ROI numbers on which you ran the inferences, e.g., `[1,2,3]`
-1. `<NINFERENCES>` is the number of inferences you ran on each ROI using each model (this should be either `3` or `1`)
-1. `<CALCULATE-METRICS>` is `1` if you want to calculate metrics in order to quantify how well the model performed, or `0` if you don't
-1. `<CREATE-PLOTS>` is `1` if you want to create plots showing 2D images with overlays of the known and predicted  masks, or `0` if you don't
-1. `<MOVIE-DIRECTORY>` is the name of the directory in which you want to place movies of the plots throughout the stacks, e.g., `movies`
-  * Note: This directory will be created if it does not exist
-1. `<NFRAMES>` is the number of frames in each movie (can't be larger than the stack size), e.g., `40`
-1. `<FRAMERATE>` is the framerate of the movies in frames per second, e.g., `2`
+
+   * E.g., `"01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet"` or `$(find . -type d -iname "0*" | awk -v FS="./" '{print $2}' | sort)`
+2. `<ROI-NUMBERS>` is a Python-formatted array of the ROI numbers on which you ran the inferences, e.g., `[1,2,3]`
+3. `<NINFERENCES>` is the number of inferences you ran on each ROI using each model (this should be either `3` or `1`)
+4. `<CALCULATE-METRICS>` is `1` if you want to calculate metrics in order to quantify how well the model performed, or `0` if you don't
+5. `<CREATE-PLOTS>` is `1` if you want to create plots showing 2D images with overlays of the known and predicted  masks, or `0` if you don't
+6. `<MOVIE-DIRECTORY>` is the name of the directory in which you want to place movies of the plots throughout the stacks, e.g., `movies`
+
+   * Note: This directory will be created if it does not exist
+7. `<NFRAMES>` is the number of frames in each movie (can't be larger than the stack size), e.g., `40`
+8. `<FRAMERATE>` is the framerate of the movies in frames per second, e.g., `2`
 
 #### Sample calls
 
