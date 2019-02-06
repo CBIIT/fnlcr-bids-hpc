@@ -27,10 +27,10 @@ Add the `--shared` option to the `init` command if you eventually want the code 
 
 2. Clone that repository into a new BARE repository:
 
-```bash
-cd /path/to/repo
-git clone --bare /path/to/code/tree myreponame.git
-```
+    ```bash
+    cd /path/to/repo
+    git clone --bare /path/to/code/tree myreponame.git
+    ```
 
 ### (2b) Create a repository elsewhere in order for the code to be cloned/pushed/pulled **BY BOTH YOU AND OTHERS**
 
@@ -38,25 +38,25 @@ git clone --bare /path/to/code/tree myreponame.git
 
 2. Create a new BARE repository:
 
-```bash
-cd /path/to/repo
-git init --bare --shared myreponame.git
-```
+    ```bash
+    cd /path/to/repo
+    git init --bare --shared myreponame.git
+    ```
 
 3. Attach and push the code tree to the new repository:
 
-```bash
-cd /path/to/code/tree
-git remote add origin /path/to/repo/myreponame
-git push --set-upstream origin master
-```
+    ```bash
+    cd /path/to/code/tree
+    git remote add origin /path/to/repo/myreponame
+    git push --set-upstream origin master
+    ```
 
 4. Ensure the repository permissions are correct:
 
-```bash
-cd /path/to/repo
-chmod -R g+rw myreponame.git
-```
+   ```bash
+   cd /path/to/repo
+   chmod -R g+rw myreponame.git
+   ```
 
 ### (3) Use the repository as normal
 
