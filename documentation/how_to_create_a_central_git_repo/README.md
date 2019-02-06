@@ -67,6 +67,6 @@ cd /path/to/working/dir
 git clone [myusername@biowulf.nih.gov:]/path/to/repo/myreponame
 ```
 
-Use `[myusename@biowulf.nih.gov:]` in the `clone` command if the repository you just created is on a remote machine such as Biowulf.
+Use `[myusername@biowulf.nih.gov:]` in the `clone` command if the repository you just created is on a remote machine such as Biowulf.
 
 Now changes can be pushed/pulled to/from the new repository.
