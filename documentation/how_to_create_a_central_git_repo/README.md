@@ -40,7 +40,7 @@ git clone --bare /path/to/code/tree myreponame.git
 
 ```bash
 cd /path/to/repo
-git init --bare --shared=all myreponame.git
+git init --bare --shared myreponame.git
 ```
 
 3. Attach and push the code tree to the new repository:
