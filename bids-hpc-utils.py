@@ -35,7 +35,7 @@ def normalize_images(images,idtype):
         arr_info(images)
         return(images)
         
-def pad_image(image, nlayers):
+def pad_images(images, nlayers):
     """
     In Unet, every layer the dimension gets divided by 2
     in the encoder path. Therefore the image size should be divisible by 2^nlayers.
@@ -43,14 +43,25 @@ def pad_image(image, nlayers):
     import math
     import numpy as np
     divisor = 2**nlayers
-    nlayers, x, y = image.shape
-    #z, x, y = image.shape
+    nlayers, x, y = images.shape
+    #z, x, y = images.shape
     x_pad = int((math.ceil(x / float(divisor)) * divisor) - x)
     y_pad = int((math.ceil(y / float(divisor)) * divisor) - y)
-    padded_image = np.pad(image, ((0,0),(0, x_pad), (0, y_pad)), 'constant', constant_values=(0, 0))
+    padded_image = np.pad(images, ((0,0),(0, x_pad), (0, y_pad)), 'constant', constant_values=(0, 0))
     return padded_image
 
-def prepare_images_for_inference(npy_file,nlayers):
+def transpose_stack(images):
+    # Split the images into all three dimensions, making the other two dimensions of the images accessible
+    # Input images should be three dimensions (e.g., a stack)
+    x_first = images.transpose((1,2,0)) # (x,y,z)
+    y_first = images.transpose((2,0,1)) # (y,z,x)
+    #z_first = images.transpose((0,1,2)) # (z,x,y)
+    z_first = images
+    return(x_first,y_first,z_first)
+    
+    
+#def prepare_images_for_inference(npy_file,nlayers):
+def main(npy_file,nlayers):
     # Scale the images automatically, split them into all three dimensions, and pad each of the resulting three stacks of images
     # This is based off of cmm_pre-inference_pipeline.py
     # Input images should be three dimensions (e.g., a stack)
@@ -61,15 +72,12 @@ def prepare_images_for_inference(npy_file,nlayers):
     images = normalize_images(images,2)
 
     # Make the other two dimensions of the images accessible
-    x_first = images.transpose((1,2,0)) # (x,y,z)
-    y_first = images.transpose((2,0,1)) # (y,z,x)
-    #z_first = images.transpose((0,1,2)) # (z,x,y)
-    z_first = images
+    x_first,y_first,z_first = transpose_stack(images)
 
     # Pad the each of 2D planes of the images
-    x_first = pad_image(x_first,nlayers)
-    y_first = pad_image(y_first,nlayers)
-    z_first = pad_image(z_first,nlayers)
+    x_first = pad_images(x_first,nlayers)
+    y_first = pad_images(y_first,nlayers)
+    z_first = pad_images(z_first,nlayers)
     
     # Write these other "views" of the test data to disk
     np.save('prepared_images-x_first.npy',x_first)
