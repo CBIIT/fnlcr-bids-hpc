@@ -60,16 +60,19 @@ def transpose_stack(images):
     return(x_first,y_first,z_first)
     
     
-#def prepare_images_for_inference(npy_file,nlayers):
-def main(npy_file,nlayers):
-    # Scale the images automatically, split them into all three dimensions, and pad each of the resulting three stacks of images
+
+def main(npy_file,nlayers,idtype=2):
+    # Prepare the images for inference: scale them automatically, split them into all three dimensions, and pad each of the resulting three stacks of images
     # This is based off of cmm_pre-inference_pipeline.py
-    # Input images should be three dimensions (e.g., a stack)
+    
+    # Load pertinent modules
     import numpy as np
+    
+    # Load images
     images = np.load(npy_file)
     
     # Automatically scale the images
-    images = normalize_images(images,2)
+    images = normalize_images(images,idtype)
 
     # Make the other two dimensions of the images accessible
     x_first,y_first,z_first = transpose_stack(images)
