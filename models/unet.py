@@ -11,43 +11,11 @@ if K.backend() == 'tensorflow' and 'NUM_INTRA_THREADS' in os.environ:
                                             intra_op_parallelism_threads=int(os.environ['NUM_INTRA_THREADS'])))
     K.set_session(sess)
 
-# Parameters
-candle_lib = '/data/BIDS-HPC/public/candle/Candle/common'
-
-def focal_loss(labels, logits, gamma=0, alpha=1.0):
-    """
-    focal loss for multi-classification
-    FL(p_t)=-alpha(1-p_t)^{gamma}ln(p_t)
-    Notice: logits is probability after softmax
-    gradient is d(Fl)/d(p_t) not d(Fl)/d(x) as described in paper
-    d(Fl)/d(p_t) * [p_t(1-p_t)] = d(Fl)/d(x)
-
-    Focal Loss for Dense Object Detection, 
-    https://doi.org/10.1016/j.ajodo.2005.02.022
-
-    :param labels: ground truth labels, shape of [batch_size]
-    :param logits: model's output, shape of [batch_size, num_cls]
-    :param gamma:
-    :param alpha:
-    :return: shape of [batch_size]
-    """
-    epsilon = 1.e-9
-    labels = tf.to_int64(labels)
-    labels = tf.convert_to_tensor(labels, tf.int64)
-    logits = tf.convert_to_tensor(logits, tf.float32)
-    num_cls = logits.shape[1]
-
-    model_out = tf.add(logits, epsilon)
-    onehot_labels = tf.one_hot(labels, num_cls)
-    ce = tf.multiply(onehot_labels, -tf.log(model_out))
-    weight = tf.multiply(onehot_labels, tf.pow(tf.subtract(1., model_out), gamma))
-    fl = tf.multiply(alpha, tf.multiply(weight, ce))
-    reduced_fl = tf.reduce_max(fl, axis=1)
-    # reduced_fl = tf.reduce_sum(fl, axis=1)  # same as reduce_max
-    return reduced_fl
-
 def initialize_parameters():
     print('Initializing parameters...')
+
+    # Parameters
+    candle_lib = '/data/BIDS-HPC/public/candle/Candle/common'
 
     # Obtain the path of the directory of this script
     file_path = os.path.dirname(os.path.realpath(__file__))
@@ -72,13 +40,37 @@ def run(gParameters):
     #### Begin model input ##########################################################################################
     # Currently based off run_unet.py
 
-    from keras.models import Model
-    from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, Conv2DTranspose, Dropout, BatchNormalization
-    from keras.optimizers import Adam
-    from keras.callbacks import ModelCheckpoint,ReduceLROnPlateau,EarlyStopping, CSVLogger, Callback
-    import pickle
-
-    modelwtsfname = 'model_weights.h5'
+    def focal_loss(labels, logits, gamma=0, alpha=1.0):
+        """
+        focal loss for multi-classification
+        FL(p_t)=-alpha(1-p_t)^{gamma}ln(p_t)
+        Notice: logits is probability after softmax
+        gradient is d(Fl)/d(p_t) not d(Fl)/d(x) as described in paper
+        d(Fl)/d(p_t) * [p_t(1-p_t)] = d(Fl)/d(x)
+    
+        Focal Loss for Dense Object Detection, 
+        https://doi.org/10.1016/j.ajodo.2005.02.022
+    
+        :param labels: ground truth labels, shape of [batch_size]
+        :param logits: model's output, shape of [batch_size, num_cls]
+        :param gamma:
+        :param alpha:
+        :return: shape of [batch_size]
+        """
+        epsilon = 1.e-9
+        labels = tf.to_int64(labels)
+        labels = tf.convert_to_tensor(labels, tf.int64)
+        logits = tf.convert_to_tensor(logits, tf.float32)
+        num_cls = logits.shape[1]
+    
+        model_out = tf.add(logits, epsilon)
+        onehot_labels = tf.one_hot(labels, num_cls)
+        ce = tf.multiply(onehot_labels, -tf.log(model_out))
+        weight = tf.multiply(onehot_labels, tf.pow(tf.subtract(1., model_out), gamma))
+        fl = tf.multiply(alpha, tf.multiply(weight, ce))
+        reduced_fl = tf.reduce_max(fl, axis=1)
+        # reduced_fl = tf.reduce_sum(fl, axis=1)  # same as reduce_max
+        return reduced_fl
 
     def dice_coef(y_true, y_pred):
         smooth = 1.
@@ -90,23 +82,13 @@ def run(gParameters):
     def dice_coef_loss(y_true, y_pred):
         return -dice_coef(y_true, y_pred)
 
-    def get_unet(img_rows, img_cols, gParameters):
+    def get_unet(img_rows, img_cols, n_layers, filter_size, dropout, activation_func, conv_size, loss_func, last_activation, batch_norm, learning_rate):
 
         print('-'*30)
         print('Creating and compiling model...')
         print('-'*30)
         print (img_rows)
         print (img_cols)
-
-        n_layers = gParameters['nlayers']
-        filter_size = gParameters['num_filters']
-        dropout = gParameters['dropout']
-        activation_func = gParameters['activation']
-        conv_size = gParameters['conv_size']
-        loss_func = gParameters['loss_func']
-        last_activation = gParameters['last_act']
-        batch_norm = gParameters['batch_norm']
-        learning_rate = float(gParameters['lr'])
 
         inputs = Input((img_rows, img_cols, 1))
         conv_layers=[] 
@@ -186,9 +168,9 @@ def run(gParameters):
         print (np.shape(return_masks))
         return [return_images, return_masks]
 
-    def evaluate_params(gParameters): 
+    def evaluate_params(images, labels, batch_size, epochs, obj_return, initialize, n_layers, filter_size, dropout, activation_func, conv_size, loss_func, last_activation, batch_norm, learning_rate):
 
-        images , masks = get_images(gParameters['images'], gParameters['labels'])
+        images , masks = get_images(images,labels)
         
         print("Training images histogram") 
         hist, bin_edges = np.histogram(images)
@@ -204,9 +186,9 @@ def run(gParameters):
         img_rows = np.shape(images)[1]
         img_cols = np.shape(images)[2]
         
-        model = get_unet(img_rows, img_cols, gParameters)
+        model = get_unet(img_rows, img_cols, n_layers, filter_size, dropout, activation_func, conv_size, loss_func, last_activation, batch_norm, learning_rate)
         
-        history_callback = train(model, images, masks, gParameters['batch_size'], gParameters['epochs'], gParameters['obj_return'], initialize=gParameters['initialize'])
+        history_callback = train(model, images, masks, batch_size, epochs, obj_return, initialize=initialize)
         return history_callback # note that history_callback is what's returned by model.fit()
 
     def preprocess_images(images):
@@ -232,14 +214,6 @@ def run(gParameters):
         imgs_mask_train = np.expand_dims(imgs_mask_train, axis= 3)
         return imgs_mask_train
 
-    class TestCallback(Callback):
-        def __init__(self, test_data):
-            self.test_data = test_data
-        def on_epoch_end(self, epoch, logs={}):
-            x, y = self.test_data
-            loss, acc = self.model.evaluate(x, y, verbose=0, batch_size = 1)
-            print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
-
     def train(model, imgs_train, imgs_mask_train, batch_size, epochs, obj_return, initialize=None):
 
         model_checkpoint = ModelCheckpoint(modelwtsfname, monitor=obj_return, save_best_only=True)
@@ -255,7 +229,7 @@ def run(gParameters):
             print("Initializing the model using:{0}\n", initialize)
             model.load_weights(initialize)
             
-        test_call=TestCallback((imgs_train,imgs_mask_train))
+        #test_call=TestCallback((imgs_train,imgs_mask_train))
         
         print(np.shape(imgs_train))
         print(np.shape(imgs_mask_train))
@@ -309,25 +283,62 @@ def run(gParameters):
         print(hist)
         print(bin_edges)
     
-        np.save('mask_predictions.npy', np.squeeze(imgs_mask_test))
+        #np.save('mask_predictions.npy', np.squeeze(imgs_mask_test))
+        np.save('mask_predictions.npy', np.squeeze(np.round(imgs_mask_test).astype('uint8')))
 
-    if not gParameters['predict']:
+    # Parameters
+    n_layers = gParameters['nlayers']
+    filter_size = gParameters['num_filters']
+    dropout = gParameters['dropout']
+    activation_func = gParameters['activation']
+    conv_size = gParameters['conv_size']
+    loss_func = gParameters['loss_func']
+    last_activation = gParameters['last_act']
+    batch_norm = gParameters['batch_norm']
+    learning_rate = float(gParameters['lr'])
+    images = gParameters['images']
+    labels = gParameters['labels']
+    batch_size = gParameters['batch_size']
+    epochs = gParameters['epochs']
+    obj_return = gParameters['obj_return']
+    initialize = gParameters['initialize']
+    do_prediction = gParameters['predict']
+
+    # Import relevant modules and functions
+    from keras.models import Model
+    from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, Conv2DTranspose, Dropout, BatchNormalization
+    from keras.optimizers import Adam
+    from keras.callbacks import ModelCheckpoint,ReduceLROnPlateau,EarlyStopping, CSVLogger, Callback
+    import pickle
+
+    class TestCallback(Callback):
+        def __init__(self, test_data):
+            self.test_data = test_data
+        def on_epoch_end(self, epoch, logs={}):
+            x, y = self.test_data
+            loss, acc = self.model.evaluate(x, y, verbose=0, batch_size = 1)
+            print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
+
+    # Basically a constant
+    modelwtsfname = 'model_weights.h5'
+
+    if not do_prediction:
         print('Training...')
-        history_callback = evaluate_params(gParameters) # note that history_callback is what's returned by model.fit()
+        history_callback = evaluate_params(images, labels, batch_size, epochs, obj_return, initialize, n_layers, filter_size, dropout, activation_func, conv_size, loss_func, last_activation, batch_norm, learning_rate) # note that history_callback is what's returned by model.fit()
         print("Minimum validation loss:")
-        print(min(history_callback.history[gParameters['obj_return']]))
+        print(min(history_callback.history[obj_return]))
         #Save the history as pickle object
         pickle.dump(history_callback.history, open( "fit_history.p", "wb" ) )
     else:
         print('Inferring...')
         #It is not necessary to pass masks for prediction, but I am just following the function
         #prototype for now.
-        images = preprocess_images(gParameters['images'])
+        images = preprocess_images(images)
         #Get the images size  
         img_rows = np.shape(images)[1]
         img_cols = np.shape(images)[2]
-        model = get_unet(img_rows, img_cols, gParameters)
-        weights = gParameters['initialize']
+        model = get_unet(img_rows, img_cols, n_layers, filter_size, dropout, activation_func, conv_size, loss_func, last_activation, batch_norm, learning_rate)
+        weights = initialize
         predict(model, weights, images)
         history_callback = None
     

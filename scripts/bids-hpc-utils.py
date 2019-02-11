@@ -64,6 +64,7 @@ def transpose_stack(images):
 def main(npy_file,nlayers,idtype=2):
     # Prepare the images for inference: scale them automatically, split them into all three dimensions, and pad each of the resulting three stacks of images
     # This is based off of cmm_pre-inference_pipeline.py
+    # Note that both the U-Net and ResNet Python scripts expect the input images to be in the uint16 range, so idtype=2 for both of these. Of course, there's no need to worry about the scale of the actual input images because the normalize_images() function with an idtype=2 argument will automatically scale the images to uint16. Likewise, both the U-Net and ResNet Python scripts expect the labels to be in the range [0,1].
     
     # Load pertinent modules
     import numpy as np
