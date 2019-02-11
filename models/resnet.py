@@ -448,7 +448,6 @@ def run(gParameters):
     
     # Basically constants
     expandChannel = True
-    reloadFlag = False
     modelwtsfname = 'model_weights.h5'
     model_json_fname  = 'model.json'
     csvfname = 'model.csv'
@@ -462,7 +461,7 @@ def run(gParameters):
         save_model_to_json(model,model_json_fname)
         model.compile(optimizer=Adam(lr=lr), loss='binary_crossentropy', metrics=['binary_crossentropy','mean_squared_error',dice_coef, dice_coef_batch, focal_loss()])
         # Load previous weights for restarting, if desired and possible
-        if os.path.isfile(oldmodelwtsfname) and reloadFlag :
+        if os.path.isfile(oldmodelwtsfname):
             print('-'*30)
             print('Loading previous weights ...')
             model.load_weights(oldmodelwtsfname)
