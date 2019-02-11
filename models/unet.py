@@ -1,18 +1,11 @@
 # Import relevant modules
-#from __future__ import print_function
-from keras import backend as K #--> FOUR ####'S ARE AN ATTEMPT TO POSSIBLE REMOVE CIRCULAR IMPORTS!!!
-import os
-import tensorflow as tf
+from keras import backend as K
 import numpy as np
-
-# Thread optimization --> SET THIS FOR BIOWULF!!!!
-if K.backend() == 'tensorflow' and 'NUM_INTRA_THREADS' in os.environ:
-    sess = tf.Session(config=tf.ConfigProto(inter_op_parallelism_threads=int(os.environ['NUM_INTER_THREADS']),
-                                            intra_op_parallelism_threads=int(os.environ['NUM_INTRA_THREADS'])))
-    K.set_session(sess)
 
 def initialize_parameters():
     print('Initializing parameters...')
+
+    import os
 
     # Parameters
     candle_lib = '/data/BIDS-HPC/public/candle/Candle/common'
@@ -57,6 +50,9 @@ def run(gParameters):
         :param alpha:
         :return: shape of [batch_size]
         """
+
+        import tensorflow as tf
+
         epsilon = 1.e-9
         labels = tf.to_int64(labels)
         labels = tf.convert_to_tensor(labels, tf.int64)
@@ -310,14 +306,6 @@ def run(gParameters):
     from keras.optimizers import Adam
     from keras.callbacks import ModelCheckpoint,ReduceLROnPlateau,EarlyStopping, CSVLogger, Callback
     import pickle
-
-    class TestCallback(Callback):
-        def __init__(self, test_data):
-            self.test_data = test_data
-        def on_epoch_end(self, epoch, logs={}):
-            x, y = self.test_data
-            loss, acc = self.model.evaluate(x, y, verbose=0, batch_size = 1)
-            print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
 
     # Basically a constant
     modelwtsfname = 'model_weights.h5'

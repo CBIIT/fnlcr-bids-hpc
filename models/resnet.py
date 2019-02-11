@@ -75,67 +75,6 @@ def run(gParameters):
     def jaccard_coef_loss(y_true, y_pred):
         return -K.log(jaccard_coef(y_true, y_pred)) + binary_crossentropy(y_pred, y_true)
     
-    def flip_axis(x, axis):
-        x = x.swapaxes(axis, 0)
-        x = x[::-1, ...]
-        x = x.swapaxes(0, axis)
-        return x
-    
-    def form_batch(X,y,batch_size,img_rows,img_cols,num_channels,num_mask_channels):
-        # I believe this takes random crops of size img_rows,img_cols from random images of the input batch
-        X_batch = np.zeros((batch_size, img_rows, img_cols, num_channels))
-        y_batch = np.zeros((batch_size, img_rows, img_cols, num_mask_channels))
-        X_height = X.shape[1]
-        X_width = X.shape[2]
-    
-        for i in range(batch_size):
-            random_width = random.randint(0, X_width - img_cols - 1)
-            random_height = random.randint(0, X_height - img_rows - 1)
-    
-            random_image = random.randint(0, X.shape[0] - 1)
-    
-            y_batch[i] = y[random_image, random_height: random_height + img_rows, random_width: random_width + img_cols,:]
-            X_batch[i] = X[random_image, random_height: random_height + img_rows, random_width: random_width + img_cols,:]
-        return X_batch, y_batch
-    
-    
-    def batch_generator(X, y, batch_size,img_rows,img_cols,num_channels,num_mask_channels, horizontal_flip=False, vertical_flip=False, swap_axis=False):
-        # This probably takes random crops and does random flips and 90-degree rotations of the input data
-        while True:
-            X_batch, y_batch = form_batch(X, y, batch_size,img_rows,img_cols,num_channels,num_mask_channels)
-            #print('Size of X batch = ' + str(X_batch.shape))
-            #print('Size of Y batch = ' + str(y_batch.shape))
-    
-            for i in range(X_batch.shape[0]):
-                xb = X_batch[i]
-                yb = y_batch[i]
-    
-                if horizontal_flip:
-                    if random.random() < 0.5:
-                        xb = flip_axis(xb, 0)
-                        yb = flip_axis(yb, 0)
-                        #print('h_flip xb = ' + str(xb.shape))
-                        #print('h_flip yb = ' + str(yb.shape))
-    
-                if vertical_flip:
-                    if random.random() < 0.5:
-                        xb = flip_axis(xb, 1)
-                        yb = flip_axis(yb, 1)
-                        #print('v_flip xb = ' + str(xb.shape))
-                        #print('v_flip yb = ' + str(yb.shape))
-    
-                if swap_axis:
-                    if random.random() < 0.5:
-                        xb = xb.swapaxes(0, 1)
-                        yb = yb.swapaxes(0, 1)
-                        #print('swap xb = ' + str(xb.shape))
-                        #print('swap yb = ' + str(yb.shape))
-    
-                X_batch[i] = xb
-                y_batch[i] = yb
-    
-            yield X_batch, y_batch
-    
     def dice_coef_batch(y_true, y_pred):
         smooth = 1.0
         intersection = K.sum(y_true * y_pred, axis=[-0, -1, 2])
@@ -158,35 +97,6 @@ def run(gParameters):
     
     def dice_coef_batch_loss(y_true, y_pred):
         return -dice_coef_batch(y_true, y_pred)
-    
-    #data consinstency check, input NPY arrays should be 3D (number of images, height, width)
-    def data_consistency_check(imgs,masks):
-        assert(len(imgs.shape)==len(masks.shape))
-        assert(imgs.shape[0]==masks.shape[0])
-        assert(imgs.shape[1]==masks.shape[1])
-        assert(imgs.shape[2]==masks.shape[2])
-        # check if the masks is between 0 and 1
-        assert(np.amin(masks) == 0 and np.amax(masks) == 1)
-    
-    # randomly change the standardization maximum value. We will agument each image by augFactor
-    def random_standardize(imgs,masks, augFactor=10):
-        data_consistency_check(imgs, masks)
-        imgs_rand = np.empty([imgs.shape[0]*augFactor, imgs.shape[1], imgs.shape[2]], dtype='float32')
-        masks_rand = np.empty([imgs.shape[0]*augFactor, imgs.shape[1], imgs.shape[2]], dtype='float32')
-        k = 0
-        for i in range(imgs.shape[0]):
-            for j in range(1,augFactor+1):
-                c_img = np.squeeze(imgs[i,:,:])
-                c_mask = np.squeeze(masks[i,:,:])
-                amax = np.amax(c_img)
-                fac = (float(j)/float(augFactor))/amax
-                print(str(i) + ":" + str(j) + ":" + str(augFactor) + ":" + str(fac) + ":" + str(amax))
-                imgs_rand[k,:,:] = c_img*fac
-                masks_rand[k,:,:] = c_mask  
-                k = k+1
-        imgs_rand = np.concatenate((imgs_rand, imgs), axis=0)
-        masks_rand = np.concatenate((masks_rand, imgs), axis=0)
-        return imgs_rand, masks_rand
     
     #Define the neural network
     def get_unet():
@@ -256,105 +166,6 @@ def run(gParameters):
         #model.compile(optimizer=Adam(lr=1e-5), loss=dice_coef_loss, metrics=[dice_coef])
         #model.compile(optimizer=Nadam(lr=1e-3), loss=dice_coef_loss, metrics=[dice_coef])
         #model.compile(optimizer=Adadelta(), loss=dice_coef_loss, metrics=[dice_coef])
-        
-        return model
-    
-    #Define the neural network
-    def get_unet0(img_rows,img_cols):
-        #droprate = 0.25
-        filt_size = 32
-        inputs = Input((img_rows, img_cols, 1))
-        
-        conv1 = Conv2D(filt_size, (3, 3), padding='same')(inputs)
-        conv1 = BatchNormalization(axis=3)(conv1)
-        conv1 = keras.layers.advanced_activations.ELU()(conv1)
-        conv1 = Conv2D(filt_size, (3, 3), padding='same')(conv1)
-        conv1 = BatchNormalization( axis=3)(conv1)
-        conv1 = keras.layers.advanced_activations.ELU()(conv1)
-        pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
-        #filt_size = filt_size*2
-        print('Filter size = ' + str(filt_size))
-    
-        conv2 = Conv2D(filt_size, (3, 3), padding='same')(pool1)
-        conv2 = BatchNormalization( axis=3)(conv2)
-        conv2 = keras.layers.advanced_activations.ELU()(conv2)
-        conv2 = Conv2D(filt_size, (3, 3), padding='same')(conv2)
-        conv2 = BatchNormalization( axis=3)(conv2)
-        conv2 = keras.layers.advanced_activations.ELU()(conv2)
-        pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
-        #filt_size = filt_size*2
-        print('Filter size = ' + str(filt_size))
-    
-        conv3 = Conv2D(filt_size, (3, 3), padding='same')(pool2)
-        conv3 = BatchNormalization( axis=3)(conv3)
-        conv3 = keras.layers.advanced_activations.ELU()(conv3)
-        conv3 = Conv2D(filt_size, (3, 3), padding='same')(conv3)
-        conv3 = BatchNormalization( axis=3)(conv3)
-        conv3 = keras.layers.advanced_activations.ELU()(conv3)
-        pool3 = MaxPooling2D(pool_size=(2, 2))(conv3)
-        #filt_size = filt_size*2
-        print('Filter size = ' + str(filt_size))
-    
-        conv4 = Conv2D(filt_size, (3, 3), padding='same')(pool3)
-        conv4 = BatchNormalization(axis=3)(conv4)
-        conv4 = keras.layers.advanced_activations.ELU()(conv4)
-        conv4 = Conv2D(filt_size, (3, 3), padding='same')(conv4)
-        conv4 = BatchNormalization( axis=3)(conv4)
-        conv4 = keras.layers.advanced_activations.ELU()(conv4)
-        pool4 = MaxPooling2D(pool_size=(2, 2))(conv4)
-        #filt_size = filt_size*2
-        print('Filter size = ' + str(filt_size))
-    
-        conv5 = Conv2D(filt_size, (3, 3), padding='same')(pool4)
-        conv5 = BatchNormalization( axis=3)(conv5)
-        conv5 = keras.layers.advanced_activations.ELU()(conv5)
-        conv5 = Conv2D(filt_size, (3, 3), padding='same')(conv5)
-        conv5 = BatchNormalization( axis=3)(conv5)
-        conv5 = keras.layers.advanced_activations.ELU()(conv5)
-        #filt_size = filt_size/2
-        print('Filter size = ' + str(filt_size))
-    
-        up6 = concatenate([Conv2DTranspose(filt_size, (2, 2), strides=(2, 2), padding='same')(conv5), conv4], axis=3)
-        conv6 = Conv2D(filt_size, (3, 3), padding='same')(up6)
-        conv6 = BatchNormalization( axis=3)(conv6)
-        conv6 = keras.layers.advanced_activations.ELU()(conv6)
-        conv6 = Conv2D(filt_size, (3, 3), padding='same')(conv6)
-        conv6 = BatchNormalization( axis=3)(conv6)
-        conv6 = keras.layers.advanced_activations.ELU()(conv6)
-        #filt_size = filt_size/2
-        print('Filter size = ' + str(filt_size))
-    
-        up7 = concatenate([Conv2DTranspose(filt_size, (2, 2), strides=(2, 2), padding='same')(conv6), conv3], axis=3)
-        conv7 = Conv2D(filt_size, (3, 3), padding='same')(up7)
-        conv7 = BatchNormalization( axis=3)(conv7)
-        conv7 = keras.layers.advanced_activations.ELU()(conv7)
-        conv7 = Conv2D(filt_size, (3, 3), padding='same')(conv7)
-        conv7 = BatchNormalization( axis=3)(conv7)
-        conv7 = keras.layers.advanced_activations.ELU()(conv7)
-        #filt_size = filt_size/2
-        print('Filter size = ' + str(filt_size))
-        
-        up8 = concatenate([Conv2DTranspose(filt_size, (2, 2), strides=(2, 2), padding='same')(conv7), conv2], axis=3)
-        conv8 = Conv2D(filt_size, (3, 3), padding='same')(up8)
-        conv8 = BatchNormalization( axis=3)(conv8)
-        conv8 = keras.layers.advanced_activations.ELU()(conv8)
-        conv8 = Conv2D(filt_size, (3, 3), padding='same')(conv8)
-        conv8 = BatchNormalization( axis=3)(conv8)
-        conv8 = keras.layers.advanced_activations.ELU()(conv8)
-        #filt_size = filt_size/2
-        print('Filter size = ' + str(filt_size))
-        
-        up9 = concatenate([Conv2DTranspose(filt_size, (2, 2), strides=(2, 2), padding='same')(conv8), conv1], axis=3)
-        conv9 = Conv2D(filt_size, (3, 3), padding='same')(up9)
-        conv9 = BatchNormalization( axis=3)(conv9)
-        conv9 = keras.layers.advanced_activations.ELU()(conv9)
-        conv9 = Conv2D(filt_size, (3, 3), padding='same')(conv9)
-        conv9 = BatchNormalization( axis=3)(conv9)
-        conv9 = keras.layers.advanced_activations.ELU()(conv9)
-        
-        conv10 = Conv2D(1, (1, 1), activation='sigmoid')(conv9)
-        
-        model = Model(inputs=[inputs], outputs=[conv10])
         
         return model
     
