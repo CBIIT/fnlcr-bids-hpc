@@ -11,18 +11,36 @@ function make_inference_params_file() {
 
 
 
-FNLCR="/home/weismanal/checkouts/fnlcr-bids-hpc"
-cd params_files
-ijob=0
-for file in *; do
-    ijob=$[ijob+1]
-    ijob2=$(printf '%03i' $ijob)
-    jobdir="job_${ijob2}"
-    mkdir ../inference_jobs/$jobdir
-    pushd ../inference_jobs/$jobdir
-    mv ../../params_files/$file .
-    cp $FNLCR/candle/run_without_candle-template.sh run_without_candle.sh
-    $file | grep resnet && model="resnet" || model="unet"
-    awk -v jobname=$jobdir -v paramsfile=$file -v model="${model}.py" '{gsub("12:00:00","00:45:00"); gsub("hpset_23",jobname); gsub("/home/weismanal/notebook/2019-01-28/jobs/not_candle/single_param_set.txt",paramsfile); gsub("unet.py",model); print}' $FNLCR/candle/run_without_candle-template.sh > run_without_candle.sh
-    popd
-done
+IMAGE_SEG=/home/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation
+#module load python/3.6 FFmpeg
+# ln -s ../inference/inference_images/roi3_prepared-z_first.npy roi3_input_img.npy
+# ln -s ~/links/1-pre-processing/roi3/1-not_padded/roi3_masks_original.npy known_masks_roi3.npy
+# for file in ../inference/inference_jobs/*; do
+#     jobnum=$(basename $file | awk -v FS="_" '{print $2}')
+#     hpset=$(basename $(grep DEFAULT_PARAMS_FILE ../inference/inference_jobs/job_${jobnum}/*.sh | awk -v FS="DEFAULT_PARAMS_FILE=" '{print $2}') | awk -v FS="_" '{print $2}')
+#     dir=$(basename $file/*.txt | rev | awk -v FS="txt." '{print $2}' | awk -v FS="_" '{print $1}' | rev)
+#     roi=$(basename $file/*.txt | rev | awk -v FS="txt." '{print $2}' | awk -v FS="_" '{print $2}' | rev)
+#     model_dir="hpset_${hpset}"
+#     mkdir -p $model_dir
+#     pushd $model_dir
+#     ln -s $(ls ../$file/*.npy) "inferred_masks-${roi}-${dir}_first.npy"
+#     popd
+# done
+
+#imodel=0; for model in $(find . -mindepth 1 -maxdepth 1 -type d | sort | awk -v FS="./" '{print $2}'); do imodel=$[imodel+1]; imodel2=$(printf '%02i' $imodel); mv $model "$imodel2-$model"; done
+
+#find . -mindepth 1 -maxdepth 1 -type d | sort | awk -v FS="./" -v ORS=" " '{print $2}'
+
+#models=$(find . -mindepth 1 -maxdepth 1 -type d | sort | awk -v FS="./" -v ORS=" " '{print $2}')
+#models=andrew
+#models=$(find . -mindepth 1 -maxdepth 1 -type d | sort | awk -v FS="./" -v ORS=" " '{print $2}')
+models="01-hpset_10"
+roi_numbers=[3]
+ninferences=3
+calculate_metrics=1
+create_plots=1
+movie_directory=movies
+nframes=40
+framerate=2
+#$IMAGE_SEG/metrics_and_plots-driver.sh <MODELS> <ROI-NUMBERS> <NINFERENCES> <CALCULATE-METRICS> <CREATE-PLOTS> <MOVIE-DIRECTORY> <NFRAMES> <FRAMERATE>
+$IMAGE_SEG/metrics_and_plots-driver.sh "$models" $roi_numbers $ninferences $calculate_metrics $create_plots $movie_directory $nframes $framerate

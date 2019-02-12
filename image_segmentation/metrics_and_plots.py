@@ -19,7 +19,7 @@ def count(arr,only2D=False):
     else:
         return(np.sum(arr,axis=(1,2)))
 
-def calculate_metrics(msk0,msk1,only2D=False):
+def calculate_metrics_func(msk0,msk1,only2D=False):
 
     # Arrays required for calculations of metrics
     target = msk0.astype('bool')
@@ -53,16 +53,22 @@ def calculate_metrics(msk0,msk1,only2D=False):
 def process_data_for_view(view_transpose_index,inference_on_dir,roi_num,model): # order of parameters here is view, inference direction, ROI
 
     # Import relevant modules
-    import my_module as utils
+    import bids_hpc_utils as bhu
     import numpy as np
     
     # Constants
+    # reverse_transpose_indices = {
+    #   'z': 0,
+    #   'x': 2,
+    #   'y': 1
+    # }
     reverse_transpose_indices = {
       'z': 0,
-      'x': 2,
-      'y': 1
+      'x': 1,
+      'y': 2
     }
     transposes = ((0,1,2),(2,0,1),(1,2,0))
+    #transposes = ((0,1,2),(1,2,0),(2,0,1))
     plotting_transposes = ((0,1,2),(0,2,1),(0,2,1))
 
     # Variables
@@ -70,10 +76,10 @@ def process_data_for_view(view_transpose_index,inference_on_dir,roi_num,model): 
     plotting_transpose = plotting_transposes[view_transpose_index]
 
     # Load the data and normalize to uint8
-    msk0 = utils.normalize_data(np.load('known_masks_roi'+str(roi_num)+'.npy').transpose(transposes[view_transpose_index]),1)
+    msk0 = bhu.normalize_images(np.load('known_masks_roi'+str(roi_num)+'.npy').transpose(transposes[view_transpose_index]),1)
     shp = msk0.shape
-    img = utils.normalize_data((np.load('roi'+str(roi_num)+'_input_img.npy').transpose(transposes[view_transpose_index]))[:shp[0],:shp[1],:shp[2]],1) # this is actually specific to the ROI only and should be renamed with a ROI index, e.g., 'images_roiX.npy'
-    msk1 = utils.normalize_data((np.round(np.load(model+'/inferred_masks-roi'+str(roi_num)+'-'+inference_on_dir+'_first.npy')).transpose(transposes[reverse_transpose_index]).transpose(transposes[view_transpose_index]))[:shp[0],:shp[1],:shp[2]],1)
+    img = bhu.normalize_images((np.load('roi'+str(roi_num)+'_input_img.npy').transpose(transposes[view_transpose_index]))[:shp[0],:shp[1],:shp[2]],1) # this is actually specific to the ROI only and should be renamed with a ROI index, e.g., 'images_roiX.npy'
+    msk1 = bhu.normalize_images((np.round(np.load(model+'/inferred_masks-roi'+str(roi_num)+'-'+inference_on_dir+'_first.npy')).transpose(transposes[reverse_transpose_index]).transpose(transposes[view_transpose_index]))[:shp[0],:shp[1],:shp[2]],1)
 
     # Do some transposing just to make the plotting a reasonable orientation so we don't have to turn our heads
     msk0 = np.transpose(msk0,plotting_transpose)
@@ -86,9 +92,17 @@ def process_data_for_view(view_transpose_index,inference_on_dir,roi_num,model): 
     msk0_rgba = gray2rgba(msk0,A=0.2*255,mycolor=[0,0,1],makeBGTransp=True)
     msk1_rgba = gray2rgba(msk1,A=0.2*255,mycolor=[1,0,0],makeBGTransp=True)
 
+    # bhu.arr_info(msk0_rgba)
+    # bhu.arr_info(img_rgba)
+    # bhu.arr_info(msk1_rgba)
+
+    # sys.exit()
+
     # Calculate the metrics
-    metrics_2d = np.array(calculate_metrics(msk0,msk1,only2D=True))
-    metrics_3d = np.array(calculate_metrics(msk0,msk1))
+    metrics_2d = np.array(calculate_metrics_func(msk0,msk1,only2D=True))
+    #print('HERE1')
+    metrics_3d = np.array(calculate_metrics_func(msk0,msk1))
+    #print('HERE2')
 
     return(msk0,shp,img,msk1,img_rgba,msk0_rgba,msk1_rgba,metrics_2d,metrics_3d)
 
@@ -118,6 +132,10 @@ ninf = int(sys.argv[3])
 calculate_metrics = bool(int(sys.argv[4]))
 create_plots = bool(int(sys.argv[5]))
 nframes = int(sys.argv[6])
+
+print(model_name, roi_nums, ninf, calculate_metrics, create_plots, nframes)
+
+#sys.exit()
 
 # Variables
 if ninf == 3:
