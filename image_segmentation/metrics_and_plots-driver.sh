@@ -50,10 +50,10 @@ for model in $models; do
 	echo "**************"
 	echo $model
 	echo "**************"
-    python ${SCRIPT_DIR}/metrics_and_plots.py $model $roi_nums $ninf $calculate_metrics $create_plots $nframes
+    #python ${SCRIPT_DIR}/metrics_and_plots.py $model $roi_nums $ninf $calculate_metrics $create_plots $nframes
 done
 
-exit
+#exit
 
 # If we've created images, make movies of them
 if [ $create_plots -eq 1 ]; then
@@ -74,6 +74,8 @@ if [ $create_plots -eq 1 ]; then
 
 	    # Set the movie filename
 	    fn=${movie_dir}/$(echo $images_dir | awk '{gsub("/movie",""); print}').mp4
+
+		#pwd
 
 	    # Create a movie that should work in all browsers
 	    ffmpeg -r $framerate -pattern_type glob -i "*.png" -c:v libx264 -crf 23 -profile:v baseline -level 3.0 -pix_fmt yuv420p -c:a aac -ac 2 -b:a 128k -movflags faststart $fn
