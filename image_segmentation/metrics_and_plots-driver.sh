@@ -50,7 +50,7 @@ for model in $models; do
 	echo "**************"
 	echo $model
 	echo "**************"
-    #python ${SCRIPT_DIR}/metrics_and_plots.py $model $roi_nums $ninf $calculate_metrics $create_plots $nframes
+    python ${SCRIPT_DIR}/metrics_and_plots.py $model $roi_nums $ninf $calculate_metrics $create_plots $nframes
 done
 
 #exit
