@@ -3,12 +3,12 @@ from __future__ import print_function
 from keras import backend as K
 import os
 
+# Parameters
+candle_lib = '/data/BIDS-HPC/public/candle/Candle/common'
+
 def initialize_parameters():
     print('Initializing parameters...')
     
-    # Parameters
-    candle_lib = '/data/BIDS-HPC/public/candle/Candle/common'
-
     # Obtain the path of the directory of this script
     file_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -231,7 +231,7 @@ def run(gParameters):
     do_prediction = gParameters['predict'] #do_prediction = bool(int(sys.argv[1]))
     inputnpyfname = gParameters['images'] #inputnpyfname = sys.argv[2]
     labels = gParameters['labels'] # sys.argv[3]
-    oldmodelwtsfname = gParameters['oldmodelwtsfname'] #oldmodelwtsfname = './old_model_weights.h5'
+    initialize = gParameters['initialize'] #initialize = './old_model_weights.h5'
     backbone = gParameters['backbone'] #backbone = 'resnet152'
     encoder = gParameters['encoder'] #encoder = 'imagenet11k'
     lr = float(gParameters['lr'])
@@ -272,10 +272,10 @@ def run(gParameters):
         save_model_to_json(model,model_json_fname)
         model.compile(optimizer=Adam(lr=lr), loss='binary_crossentropy', metrics=['binary_crossentropy','mean_squared_error',dice_coef, dice_coef_batch, focal_loss()])
         # Load previous weights for restarting, if desired and possible
-        if os.path.isfile(oldmodelwtsfname):
+        if os.path.isfile(initialize):
             print('-'*30)
             print('Loading previous weights ...')
-            model.load_weights(oldmodelwtsfname)
+            model.load_weights(initialize)
         # Set up the training callback functions
         model_checkpoint = ModelCheckpoint(modelwtsfname, monitor=obj_return, save_best_only=True)
         reduce_lr = ReduceLROnPlateau(monitor=obj_return, factor=0.1,patience=100, min_lr=0.001,verbose=1)

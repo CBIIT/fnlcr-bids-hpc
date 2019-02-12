@@ -2,13 +2,13 @@
 from keras import backend as K
 import numpy as np
 
+# Parameters
+candle_lib = '/data/BIDS-HPC/public/candle/Candle/common'
+
 def initialize_parameters():
     print('Initializing parameters...')
 
     import os
-
-    # Parameters
-    candle_lib = '/data/BIDS-HPC/public/candle/Candle/common'
 
     # Obtain the path of the directory of this script
     file_path = os.path.dirname(os.path.realpath(__file__))
