@@ -11,7 +11,8 @@ function make_inference_params_file() {
 
 
 
-IMAGE_SEG=/home/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation
+#IMAGE_SEG=/home/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation
+IMAGE_SEG=/Users/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation
 #module load python/3.6 FFmpeg
 # ln -s ../inference/inference_images/roi3_prepared-z_first.npy roi3_input_img.npy
 # ln -s ~/links/1-pre-processing/roi3/1-not_padded/roi3_masks_original.npy known_masks_roi3.npy
