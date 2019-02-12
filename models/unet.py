@@ -282,24 +282,6 @@ def run(gParameters):
         #np.save('mask_predictions.npy', np.squeeze(imgs_mask_test))
         np.save('mask_predictions.npy', np.squeeze(np.round(imgs_mask_test).astype('uint8')))
 
-    # Parameters
-    n_layers = gParameters['nlayers']
-    filter_size = gParameters['num_filters']
-    dropout = gParameters['dropout']
-    activation_func = gParameters['activation']
-    conv_size = gParameters['conv_size']
-    loss_func = gParameters['loss_func']
-    last_activation = gParameters['last_act']
-    batch_norm = gParameters['batch_norm']
-    learning_rate = float(gParameters['lr'])
-    images = gParameters['images']
-    labels = gParameters['labels']
-    batch_size = gParameters['batch_size']
-    epochs = gParameters['epochs']
-    obj_return = gParameters['obj_return']
-    initialize = gParameters['initialize']
-    do_prediction = gParameters['predict']
-
     # Import relevant modules and functions
     from keras.models import Model
     from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, Conv2DTranspose, Dropout, BatchNormalization
@@ -310,8 +292,26 @@ def run(gParameters):
     # Basically a constant
     modelwtsfname = 'model_weights.h5'
 
-    if not do_prediction:
+    if not gParameters['predict']:
         print('Training...')
+
+        # Parameters
+        n_layers = gParameters['nlayers']
+        filter_size = gParameters['num_filters']
+        dropout = gParameters['dropout']
+        activation_func = gParameters['activation']
+        conv_size = gParameters['conv_size']
+        loss_func = gParameters['loss_func']
+        last_activation = gParameters['last_act']
+        batch_norm = gParameters['batch_norm']
+        learning_rate = float(gParameters['lr'])
+        images = gParameters['images']
+        labels = gParameters['labels']
+        batch_size = gParameters['batch_size']
+        epochs = gParameters['epochs']
+        obj_return = gParameters['obj_return']
+        initialize = gParameters['initialize']
+
         history_callback = evaluate_params(images, labels, batch_size, epochs, obj_return, initialize, n_layers, filter_size, dropout, activation_func, conv_size, loss_func, last_activation, batch_norm, learning_rate) # note that history_callback is what's returned by model.fit()
         print("Minimum validation loss:")
         print(min(history_callback.history[obj_return]))
@@ -319,6 +319,20 @@ def run(gParameters):
         pickle.dump(history_callback.history, open( "fit_history.p", "wb" ) )
     else:
         print('Inferring...')
+
+        # Parameters
+        n_layers = gParameters['nlayers']
+        filter_size = gParameters['num_filters']
+        dropout = gParameters['dropout']
+        activation_func = gParameters['activation']
+        conv_size = gParameters['conv_size']
+        loss_func = gParameters['loss_func']
+        last_activation = gParameters['last_act']
+        batch_norm = gParameters['batch_norm']
+        learning_rate = float(gParameters['lr'])
+        images = gParameters['images']
+        initialize = gParameters['initialize']
+
         #It is not necessary to pass masks for prediction, but I am just following the function
         #prototype for now.
         images = preprocess_images(images)

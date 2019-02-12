@@ -226,22 +226,9 @@ def run(gParameters):
         else:
             return(imgs_input)
 
-    # Parameters
-    segmentation_models_repo = gParameters['segmentation_models_repo'] #sys.path.append('/home/weismanal/checkouts/segmentation_models')
-    do_prediction = gParameters['predict'] #do_prediction = bool(int(sys.argv[1]))
-    inputnpyfname = gParameters['images'] #inputnpyfname = sys.argv[2]
-    labels = gParameters['labels'] # sys.argv[3]
-    initialize = gParameters['initialize'] #initialize = './old_model_weights.h5'
-    backbone = gParameters['backbone'] #backbone = 'resnet152'
-    encoder = gParameters['encoder'] #encoder = 'imagenet11k'
-    lr = float(gParameters['lr'])
-    batch_size = gParameters['batch_size']
-    obj_return = gParameters['obj_return']
-    epochs = gParameters['epochs']
-
     # Import relevant modules and functions
     import sys
-    sys.path.append(segmentation_models_repo)
+    sys.path.append(gParameters['segmentation_models_repo'])
     import numpy as np
     from keras.models import Model
     from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, Conv2DTranspose, Dropout
@@ -263,8 +250,21 @@ def run(gParameters):
     model_json_fname  = 'model.json'
     csvfname = 'model.csv'
     
+    do_prediction = gParameters['predict']
     if not do_prediction: # Train...
         print('Training...')
+
+        # Parameters
+        inputnpyfname = gParameters['images']
+        labels = gParameters['labels']
+        initialize = gParameters['initialize']
+        backbone = gParameters['backbone']
+        encoder = gParameters['encoder']
+        lr = float(gParameters['lr'])
+        batch_size = gParameters['batch_size']
+        obj_return = gParameters['obj_return']
+        epochs = gParameters['epochs']
+
         # Preprocess the data
         imgs_train,imgs_mask_train = preprocess_data(do_prediction,inputnpyfname,labels,expandChannel,backbone)
         # Load, save, and compile the model
@@ -287,14 +287,23 @@ def run(gParameters):
         print(min(history_callback.history[obj_return]))
     else: # ...or predict
         print('Inferring...')
+
+        # Parameters
+        inputnpyfname = gParameters['images']
+        initialize = gParameters['initialize']
+        backbone = gParameters['backbone']
+        # lr = float(gParameters['lr']) # this isn't needed but we're keeping it for the U-Net, where it is "needed"
+
         # Preprocess the data
         imgs_infer = preprocess_data(do_prediction,inputnpyfname,'',expandChannel,backbone)
         # Load the model
-        model = get_model(model_json_fname,modelwtsfname)
+        #model = get_model(model_json_fname,initialize)
+        model = get_model(os.path.dirname(initialize)+'/'+model_json_fname,initialize)
+        
         # Run inference
         imgs_test_predict = model.predict(imgs_infer, batch_size=1, verbose=1)
         # Save the predicted masks
-        np.save(labels, np.squeeze(np.round(imgs_test_predict).astype('uint8')))
+        np.save('mask_predictions.npy', np.squeeze(np.round(imgs_test_predict).astype('uint8')))
         history_callback = None
     
     #### End model input ############################################################################################
