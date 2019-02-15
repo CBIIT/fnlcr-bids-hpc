@@ -1,13 +1,5 @@
 #!/bin/bash
 
-function make_inference_params_file() {
-    # From the last good training parameters file and set of weights, create the corresponding inference parameters file
-    weightsfile=$1
-    paramsfile=$2
-    inf_images=$3
-    awk -v doprint=1 '{if($0~/^verbose=/)doprint=0; if(doprint)print}' $paramsfile | grep -v "^images *=\|^labels *=\|^initialize *=\|^predict *=\|^epochs *=\|^encoder *=\|^batch_size *=\|^obj_return *="
-    echo -e "images = '$inf_images'\ninitialize = '$weightsfile'\npredict = True"
-}
 
 
 
@@ -34,7 +26,8 @@ module load python/3.6 FFmpeg
 
 #models=$(find . -mindepth 1 -maxdepth 1 -type d | sort | awk -v FS="./" -v ORS=" " '{print $2}')
 #models=andrew
-models=$(find . -mindepth 1 -maxdepth 1 -type d | sort | awk -v FS="./" -v ORS=" " '{print $2}')
+#models=$(find . -mindepth 1 -maxdepth 1 -type d | sort | awk -v FS="./" -v ORS=" " '{print $2}')
+models=$(find . -mindepth 1 -maxdepth 1 -type d -iregex "^\./1[2-7].*" | sort | awk -v FS="./" -v ORS=" " '{print $2}')
 #models="02-hpset_11"
 roi_numbers=[3]
 ninferences=3

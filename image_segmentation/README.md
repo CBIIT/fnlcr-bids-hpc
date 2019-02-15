@@ -1,162 +1,115 @@
-* [Home](https://cbiit.github.io/fnlcr-bids-hpc)
-  * **Image segmentation**
-  * [Documentation](https://cbiit.github.io/fnlcr-bids-hpc/documentation)
-    * [How to create a central git repository](https://cbiit.github.io/fnlcr-bids-hpc/documentation/how_to_create_a_central_git_repo)
+# Pre-inference workflow
 
+**Prerequisites:** It is assumed you have completed training all models.
 
----
+## (0) Set-up
 
-# Post-processing
-
-## metrics_and_plots-driver.sh
-
-Call this script in order to generate metrics and create plots for evaluating how well your model performs a 2D image segmentation task on particular regions of interest (ROIs) with known masks having two classes: background (0) and foreground (1).  All data should have the dimensions (N,H,W), where N is the number of Height-by-Width images in the stack.
-
-In this documentation we assume the data are 3D so that N, H, and W actually correspond to what we define to be the z, y, and x directions, respectively, and three inferences must therefore be run---one on each direction (spatially correlated images; `<NINFERENCES>`=3).  However, the N axis can instead correspond to the stack dimension of completely uncorrelated images, in which case inference along only the N axis makes sense (spatially uncorrelated images; `<NINFERENCES>`=1).  In this case the only .npy files below should have the suffix "-z_first.npy"; there should not be any with the suffixes "-x_first.npy" or "-y_first.npy".
-
-### Setup
-
-1. Check out the current repository and set the variable IMAGE_SEG to where the image_segmentation directory is located, e.g.,
-
-   `IMAGE_SEG=/Users/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation`
-2. In some working directory, place .npy files (or symbolic links to them) containing the images and true masks for the ROIs in the format `roiX_input_img.npy` and `known_masks_roiX.npy`, where X is an integer (1, 2, 3, etc.).
-3. In the same working directory, create a directory with the model name for each model containing inference results.
-4. In each model directory, place .npy files (or symbolic links to them) containing the inferred masks on the ROIs in the format `inferred_masks-roiX-Y_first.npy`, where X corresponds to the ROI on which inference was done and Y takes on the values x, y, or z and refers to the direction orthogonal to which the 2D inferences were performed.
-
-   For example, if inference on the i-th image in the NxHxW stack is specified by img(i,:,:), then Y would be set to z due to the correspondence (N,H,W) <--> (z,y,x).  Similarly, Y would be set to y if inference were done on the j-th image specified by img(:,j,:), and Y would be set to x if inference were done on the k-th image specified by img(:,:,k).  As noted above, if the images in the stack are not correlated in space and only a single inference is done, Y should always be set to z for the single inference file.
-
-*Explicit example of directory structure for spatially correlated images:*
-
-```
-├── 01-roi1_only_uncombined_unet
-│   ├── inferred_masks-roi1-x_first.npy
-│   ├── inferred_masks-roi1-y_first.npy
-│   ├── inferred_masks-roi1-z_first.npy
-│   ├── inferred_masks-roi2-x_first.npy
-│   ├── inferred_masks-roi2-y_first.npy
-│   ├── inferred_masks-roi2-z_first.npy
-│   ├── inferred_masks-roi3-x_first.npy
-│   ├── inferred_masks-roi3-y_first.npy
-│   └── inferred_masks-roi3-z_first.npy
-├── 02-roi2_only_uncombined_unet
-│   ├── inferred_masks-roi1-x_first.npy
-│   ├── inferred_masks-roi1-y_first.npy
-│   ├── inferred_masks-roi1-z_first.npy
-│   ├── inferred_masks-roi2-x_first.npy
-│   ├── inferred_masks-roi2-y_first.npy
-│   ├── inferred_masks-roi2-z_first.npy
-│   ├── inferred_masks-roi3-x_first.npy
-│   ├── inferred_masks-roi3-y_first.npy
-│   └── inferred_masks-roi3-z_first.npy
-├── 03-roi1+roi2_uncombined_unet
-│   ├── inferred_masks-roi1-x_first.npy
-│   ├── inferred_masks-roi1-y_first.npy
-│   ├── inferred_masks-roi1-z_first.npy
-│   ├── inferred_masks-roi2-x_first.npy
-│   ├── inferred_masks-roi2-y_first.npy
-│   ├── inferred_masks-roi2-z_first.npy
-│   ├── inferred_masks-roi3-x_first.npy
-│   ├── inferred_masks-roi3-y_first.npy
-│   └── inferred_masks-roi3-z_first.npy
-├── 04-roi1+roi2_combined_unet
-│   ├── inferred_masks-roi1-x_first.npy
-│   ├── inferred_masks-roi1-y_first.npy
-│   ├── inferred_masks-roi1-z_first.npy
-│   ├── inferred_masks-roi2-x_first.npy
-│   ├── inferred_masks-roi2-y_first.npy
-│   ├── inferred_masks-roi2-z_first.npy
-│   ├── inferred_masks-roi3-x_first.npy
-│   ├── inferred_masks-roi3-y_first.npy
-│   └── inferred_masks-roi3-z_first.npy
-├── 05-roi1+roi2_combined_resnet
-│   ├── inferred_masks-roi1-x_first.npy
-│   ├── inferred_masks-roi1-y_first.npy
-│   ├── inferred_masks-roi1-z_first.npy
-│   ├── inferred_masks-roi2-x_first.npy
-│   ├── inferred_masks-roi2-y_first.npy
-│   ├── inferred_masks-roi2-z_first.npy
-│   ├── inferred_masks-roi3-x_first.npy
-│   ├── inferred_masks-roi3-y_first.npy
-│   └── inferred_masks-roi3-z_first.npy
-├── known_masks_roi1.npy
-├── known_masks_roi2.npy
-├── known_masks_roi3.npy
-├── roi1_input_img.npy
-├── roi2_input_img.npy
-├── roi3_input_img.npy
-```
-
-*Explicit example of directory structure for spatially uncorrelated images:*
-
-```
-├── 01-roi1_only_uncombined_unet
-│   ├── inferred_masks-roi1-z_first.npy
-│   ├── inferred_masks-roi2-z_first.npy
-│   └── inferred_masks-roi3-z_first.npy
-├── 02-roi2_only_uncombined_unet
-│   ├── inferred_masks-roi1-z_first.npy
-│   ├── inferred_masks-roi2-z_first.npy
-│   └── inferred_masks-roi3-z_first.npy
-├── 03-roi1+roi2_uncombined_unet
-│   ├── inferred_masks-roi1-z_first.npy
-│   ├── inferred_masks-roi2-z_first.npy
-│   └── inferred_masks-roi3-z_first.npy
-├── 04-roi1+roi2_combined_unet
-│   ├── inferred_masks-roi1-z_first.npy
-│   ├── inferred_masks-roi2-z_first.npy
-│   └── inferred_masks-roi3-z_first.npy
-├── 05-roi1+roi2_combined_resnet
-│   ├── inferred_masks-roi1-z_first.npy
-│   ├── inferred_masks-roi2-z_first.npy
-│   └── inferred_masks-roi3-z_first.npy
-├── known_masks_roi1.npy
-├── known_masks_roi2.npy
-├── known_masks_roi3.npy
-├── roi1_input_img.npy
-├── roi2_input_img.npy
-├── roi3_input_img.npy
-```
-
-### Call format
- 
-```
-$IMAGE_SEG/metrics_and_plots-driver.sh <MODELS> <ROI-NUMBERS> <NINFERENCES> <CALCULATE-METRICS> <CREATE-PLOTS> <MOVIE-DIRECTORY> <NFRAMES> <FRAMERATE>
-```
-
-where
-
-1. `<MODELS>` is a whitespace-separated list of model names, i.e., the names of the directories of the models you created containing the inference .npy files
-
-   * E.g., `"01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet"` or `$(find . -type d -iname "0*" | awk -v FS="./" '{print $2}' | sort)`
-2. `<ROI-NUMBERS>` is a Python-formatted array of the ROI numbers on which you ran the inferences, e.g., `[1,2,3]`
-3. `<NINFERENCES>` is the number of inferences you ran on each ROI using each model (this should be either `3` or `1`)
-4. `<CALCULATE-METRICS>` is `1` if you want to calculate metrics in order to quantify how well the model performed, or `0` if you don't
-5. `<CREATE-PLOTS>` is `1` if you want to create plots showing 2D images with overlays of the known and predicted  masks, or `0` if you don't
-6. `<MOVIE-DIRECTORY>` is the name of the directory in which you want to place movies of the plots throughout the stacks, e.g., `movies`
-
-   * Note: This directory will be created if it does not exist
-7. `<NFRAMES>` is the number of frames in each movie (shouldn't be larger than the stack size), e.g., `40`
-8. `<FRAMERATE>` is the framerate of the movies in frames per second, e.g., `2`
-
-#### Sample calls
+Clone the fnlcr-bids-hpc repository, load the latest Python installation on Biowulf, set up the Python and Bash paths to include the image_segmentation libraries, and create the empty required directories, e.g.,
 
 ```bash
-# Process the data but don't output anything
-$IMAGE_SEG/metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 3 0 0 "" "" ""
-
-# Output the metrics in 3d_metrics.txt
-$IMAGE_SEG/metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 3 1 0 "" "" ""
-
-# Create plots/movies but don't output metrics
-$IMAGE_SEG/metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 3 0 1 /Users/weismanal/notebook/2018-12-12/movies 40 2
-
-# Do both
-$IMAGE_SEG/metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 3 1 1 /Users/weismanal/notebook/2018-12-12/movies 40 2
-
-# Do both but for an uncorrelated image stack
-$IMAGE_SEG/metrics_and_plots-driver.sh "01-roi1_only_uncombined_unet 03-roi1+roi2_uncombined_unet" [1,2,3] 1 1 1 /Users/weismanal/notebook/2018-12-12/movies 40 2
+# In Bash:
+git clone git@github.com:CBIIT/fnlcr-bids-hpc.git /home/weismanal/checkouts
+module load python/3.6
+export PYTHONPATH=$PYTHONPATH:/home/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation
+export IMAGE_SEG=/home/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation
+mkdir inference_images params_files inference_jobs
 ```
 
-## metrics_and_plots.py
+## (1) Preprocess the inference images
 
-This file is called by metrics_and_plots-driver.sh and need not be called explicitly.
+Preprocess the inference images by scaling them to the format required for the model, exposing the other two dimensions of the images, and padding the 2D planes of the resulting three images so they can be run through an `nlayers_max`-layer U-Net:
+
+```python
+# In Python:
+from image_segmentation import preprocess_inference_images
+preprocess_inference_images(images_npy_file, idtype, nlayers_max, prefix)
+```
+
+For example,
+
+```python
+# In Python:
+from image_segmentation import preprocess_inference_images
+roi3_raw = '/home/weismanal/links/1-pre-processing/roi3/1-not_padded/roi3_images_original.npy'
+fov_raw = '/home/weismanal/links/1-pre-processing/field_of_view/field_of_view.npy'
+preprocess_inference_images(roi3_raw, 2, 6, 'inference_images/roi3_prepared')
+preprocess_inference_images(fov_raw, 2, 6, 'inference_images/fov_prepared')
+```
+
+will produce six images in the inference_images directory:
+
+```
+roi3_prepared-x_first.npy
+roi3_prepared-y_first.npy
+roi3_prepared-z_first.npy
+fov_prepared-x_first.npy
+fov_prepared-y_first.npy
+fov_prepared-z_first.npy
+```
+
+The images will have been scaled to uint16 (from `idtype`=2; this is the format expected by both the U-Net and ResNet scripts) and padded so they can be run through a six-layer U-Net (from `nlayers_max`=6).  Note that there is no need to worry about the scaling of the input images; they are scaled automatically using the normalize_images() Python function.
+
+## (2) Create the inference parameters files
+
+Create a text file containing two whitespace-separate columns: (1) some text identifier of the model's hyperparameter set and (2) the corresponding directory containing the training results, e.g.,
+
+```
+10 /home/weismanal/notebook/2019-01-20/upf_kedar_full/experiments/X010
+11 /home/weismanal/notebook/2019-01-28/jobs/candle/experiments/X003
+16 /home/weismanal/notebook/2019-01-20/upf_kedar_full/experiments/X010
+17 /home/weismanal/notebook/2019-01-20/upf_kedar_full/experiments/X010
+22 /home/weismanal/notebook/2019-01-20/upf_kedar_full/experiments/X010
+23 /home/weismanal/notebook/2019-01-28/jobs/candle/experiments/X003
+28 /home/weismanal/notebook/2019-01-20/upf_kedar_full/experiments/X010
+30 /home/weismanal/notebook/2019-02-11/unet_on_kedars_data-hpset_30
+32 /home/weismanal/notebook/2019-02-07/more_complex_models_with_batch_norm/hpset_32/continued/continued
+33 /home/weismanal/notebook/2019-02-07/more_complex_models_with_batch_norm/hpset_33/continued/continued
+34 /home/weismanal/notebook/2019-01-28/jobs/candle/experiments/X003
+21a /home/weismanal/notebook/2019-01-28/jobs/candle/experiments/X004
+21b /home/weismanal/notebook/2019-01-28/jobs/candle/experiments/X004
+21c /home/weismanal/notebook/2019-01-28/jobs/candle/experiments/X004
+21d /home/weismanal/notebook/2019-01-28/jobs/candle/experiments/X004
+last_good_unet /home/weismanal/notebook/2019-01-28/jobs/not_candle/continuation
+resnet /home/weismanal/notebook/2019-02-11/resnet_on_kedars_data
+```
+
+Then create the input parameters files for running inference using Keras:
+
+```bash
+# In Bash:
+. $IMAGE_SEG/image_segmentation.sh
+make_all_inference_params_files <training_output_dirs_file>
+```
+
+For example,
+
+```bash
+# In Bash:
+. $IMAGE_SEG/image_segmentation.sh
+make_all_inference_params_files training_output_dirs.txt
+```
+
+will produce NHPSETS x NINFIMAGES parameters files in the params_files directory, where NHPSETS is the number of hyperparameter sets (i.e., lines in training_output_dirs.txt) and NINFIMAGES is the number of .npy files in the inference_images directory on which inference will be run.
+
+## (3) Set up the job
+
+Copy over and automatically modify the job submission template by running
+
+```bash
+# In Bash:
+. $IMAGE_SEG/image_segmentation.sh
+set_up_jobs
+```
+
+## (4) Run the jobs
+
+Once you've confirmed that everything in the inference_jobs directory looks reasonable, you can submit the jobs by, e.g.,
+
+```bash
+# In Bash
+for jobdir in $(ls inference_jobs/); do
+    pushd inference_jobs/$jobdir > /dev/null
+    sbatch run_without_candle.sh
+    popd > /dev/null
+done
+```

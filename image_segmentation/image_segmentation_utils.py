@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 def arr_info(arr):
     # Print information about a numpy array
     import numpy as np
