@@ -15,7 +15,7 @@ export IMAGE_SEG=/home/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation
 mkdir inference_images params_files inference_jobs
 ```
 
-## (1) Preprocess the inference images
+## (1) Create preprocessed inference images
 
 Preprocess the inference images by scaling them to the format required for the model, exposing the other two dimensions of the images, and padding the 2D planes of the resulting three images so they can be run through an `nlayers_max`-layer U-Net:
 
@@ -91,9 +91,9 @@ make_all_inference_params_files training_output_dirs.txt
 
 will produce NHPSETS x NINFIMAGES parameters files in the params_files directory, where NHPSETS is the number of hyperparameter sets (i.e., lines in training_output_dirs.txt) and NINFIMAGES is the number of .npy files in the inference_images directory on which inference will be run.
 
-## (3) Set up the job
+## (3) Create and organize all files needed for running the jobs
 
-Copy over and automatically modify the job submission template by running
+Move the parameters files to and create and modify the job submission template in the inference_jobs directory by running
 
 ```bash
 # In Bash:
@@ -101,7 +101,7 @@ Copy over and automatically modify the job submission template by running
 set_up_jobs
 ```
 
-## (4) Run the jobs
+## (4) Submit the jobs to the queue
 
 Once you've confirmed that everything in the inference_jobs directory looks reasonable, you can submit the jobs by, e.g.,
 
@@ -113,3 +113,6 @@ for jobdir in $(ls inference_jobs/); do
     popd > /dev/null
 done
 ```
+
+# Post-processing workflow
+
