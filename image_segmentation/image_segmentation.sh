@@ -1,3 +1,25 @@
+function create_links_to_inferred_masks() {
+    inference_dir=$1
+    imodel=0
+    old_hpset=""
+    for file in $inference_dir/*; do
+        jobnum=$(basename $file | awk -v FS="_" '{print $2}')
+        dir=$(basename $file/*.txt | rev | awk -v FS="txt." '{print $2}' | awk -v FS="_" '{print $1}' | rev)
+        roi=$(basename $file/*.txt | rev | awk -v FS="txt." '{print $2}' | awk -v FS="_" '{print $2}' | rev)
+        hpset=$(basename $(grep DEFAULT_PARAMS_FILE $inference_dir/job_${jobnum}/*.sh | awk -v FS="DEFAULT_PARAMS_FILE=" '{print $2}') | awk -v FS="params_" '{print $2}' | awk -v FS="_${roi}_${dir}.txt" '{print $1}')
+        if [ "a${hpset}" != "a${old_hpset}" ]; then
+            imodel=$[imodel+1]
+            imodel2=$(printf '%02i' $imodel)
+            model_dir="${imodel2}-hpset_${hpset}"
+            mkdir $model_dir
+            old_hpset=$hpset
+        fi
+        pushd $model_dir > /dev/null
+        ln -s $(ls $file/*.npy) "inferred_masks-${roi}-${dir}_first.npy"
+        popd > /dev/null
+    done
+}
+
 function get_training_info() {
     # Obtain the final weights file and training parameters file for the give training hyperparameter set name and output directory
     hpset=$1

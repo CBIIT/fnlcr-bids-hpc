@@ -1,6 +1,6 @@
 # Pre-inference workflow
 
-**Prerequisites:** It is assumed you have completed training all models.
+**Goal:** Prepare for -- and initiate -- running inference (i.e., the semantic segmentation task) on some images using models that you have completed training.
 
 ## (0) Set-up
 
@@ -30,8 +30,8 @@ For example,
 ```python
 # In Python:
 from image_segmentation import preprocess_inference_images
-roi3_raw = '/home/weismanal/links/1-pre-processing/roi3/1-not_padded/roi3_images_original.npy'
-fov_raw = '/home/weismanal/links/1-pre-processing/field_of_view/field_of_view.npy'
+roi3_raw = '/data/weismanal/notebook/2018-12-11/CellB_R_IASEM.npy'
+fov_raw = '/data/weismanal/originals/mammalian_sweep/data/images/padded_images_cellB_FOV_Mito.npy'
 preprocess_inference_images(roi3_raw, 2, 6, 'inference_images/roi3_prepared')
 preprocess_inference_images(fov_raw, 2, 6, 'inference_images/fov_prepared')
 ```
@@ -114,5 +114,107 @@ for jobdir in $(ls inference_jobs/); do
 done
 ```
 
-# Post-processing workflow
+# Postprocessing workflow
 
+**Goal:** Evaluate how well your models performed semantic segmentation on images with known masks by generating metrics and movies.
+
+## (0) Set-up
+
+Clone the fnlcr-bids-hpc repository, load the latest Python and FFmpeg installations on Biowulf, and set up the Python and Bash paths to include the image_segmentation libraries, e.g.,
+
+```bash
+# In Bash:
+git clone git@github.com:CBIIT/fnlcr-bids-hpc.git /home/weismanal/checkouts
+module load python/3.6 FFmpeg
+export PYTHONPATH=$PYTHONPATH:/home/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation
+export IMAGE_SEG=/home/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation
+```
+
+## (1) Set up the directory structure using symbolic links
+
+Create symbolic links in the current directory to the images and corresponding known masks, e.g.,
+
+```bash
+# In Bash:
+ln -s /data/weismanal/notebook/2018-12-11/CellB_R_IASEM.npy roi3_input_img.npy
+ln -s /data/weismanal/notebook/2018-12-11/CellB_R_IASEM-label.npy known_masks_roi3.npy
+```
+
+While of course these files need not be linked to (they may simply be referenced later) nor have the filename format
+
+```
+roiX_input_img.npy
+roiY_input_img.npy
+...
+known_masks_roiX.npy
+known_masks_roiY.npy
+...
+```
+
+for consistency with what follows it helps to adopt this naming convention and to place the links in the current working directory.
+
+Since there are potentially many inferred masks, it's best to create the links automatically; if the naming conventions of the pre-inference workflow section are followed, this can be accomplished via
+
+```bash
+# In Bash:
+. $IMAGE_SEG/image_segmentation.sh
+create_links_to_inferred_masks <inference_results_directory>
+```
+
+For example,
+
+```bash
+# In Bash:
+. $IMAGE_SEG/image_segmentation.sh
+create_links_to_inferred_masks /home/weismanal/notebook/2019-02-11/inference/inference_jobs
+```
+
+will create NHPSETS numbered directories each containing links to all the masks inferred by the corresponding model, e.g.,
+
+```
+...
+08-hpset_21d/inferred_masks-fov-x_first.npy
+08-hpset_21d/inferred_masks-fov-y_first.npy
+08-hpset_21d/inferred_masks-fov-z_first.npy
+08-hpset_21d/inferred_masks-roi3-x_first.npy
+08-hpset_21d/inferred_masks-roi3-y_first.npy
+08-hpset_21d/inferred_masks-roi3-z_first.npy
+09-hpset_22/inferred_masks-fov-x_first.npy
+09-hpset_22/inferred_masks-fov-y_first.npy
+09-hpset_22/inferred_masks-fov-z_first.npy
+09-hpset_22/inferred_masks-roi3-x_first.npy
+09-hpset_22/inferred_masks-roi3-y_first.npy
+09-hpset_22/inferred_masks-roi3-z_first.npy
+...
+```
+
+## (2) Load the data
+
+Use the functions
+
+```python
+# In Python
+load_images(npy_file)
+load_inferred_masks(roi, unpadded_shape, models, inference_directions)
+```
+
+to load and preprocess the data for all further types of analysis (whether metric calculation or movie creation).  E.g.,
+
+```python
+# In Python
+from image_segmentation import load_images, load_inferred_masks
+roi = 'roi3'
+models = ['08-hpset_21d','09-hpset_22']
+inference_directions = ['x','y','z']
+images = load_images(roi+'_input_img.npy')
+known_masks = load_images('known_masks_'+roi+'.npy')
+inferred_masks = load_inferred_masks(roi, images.shape, models, inference_directions)
+```
+
+will load the images in the `images` array, the known masks in the `known_masks` array, and the masks inferred by every specified model in every specified inference direction in the `inferred_masks` array.
+
+```python
+# In Python
+from image_segmentation import calculate_metrics
+metrics_2d, metrics_3d = calculate_metrics(known_masks,inferred_masks)
+```
