@@ -37,15 +37,15 @@ def calculate_metrics(known_masks, inferred_masks, nviews):
 
     return(metrics_2d, metrics_3d)
 
-def load_images(npy_file):
+def load_images(npy_file, dir='.'):
     # Load and normalize the images to uint8
     import numpy as np
     from . import utils
-    images = np.load(npy_file)
+    images = np.load(dir+'/'+npy_file)
     images = utils.normalize_images(images,1)
     return(images)
 
-def load_inferred_masks(roi, unpadded_shape, models, inference_directions):
+def load_inferred_masks(roi, unpadded_shape, models, inference_directions, dir='.'):
     # Load and process the masks inferred by every model in every inference direction
 
     # Import relevant modules
@@ -63,7 +63,7 @@ def load_inferred_masks(roi, unpadded_shape, models, inference_directions):
         iinfdir = 0
         for inference_direction in inference_directions:
             dir_index = dirs.index(inference_direction)
-            msks = np.load(model+'/inferred_masks-'+roi+'-'+inference_direction+'_first.npy')
+            msks = np.load(dir+'/'+model+'/inferred_masks-'+roi+'-'+inference_direction+'_first.npy')
             msks = msks.transpose(reverse_transpose_indices[dir_index])
             msks = np.round(msks)
             msks = msks[:unpadded_shape[0],:unpadded_shape[1],:unpadded_shape[2]]

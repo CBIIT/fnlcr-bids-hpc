@@ -1,6 +1,6 @@
 # These are "compound" functions used in the pre-inference workflow. Simpler functions should be placed in the utils module.
 
-def pre_process_inference_images(images_npy_file, idtype, nlayers_max, prefix):
+def pre_process_inference_images(images_npy_file, idtype, nlayers_max, prefix, dir='.'):
     # Load the images, scale them, make the other two dimensions accessible, pad the resulting images, and save them to disk
 
     # Load relevant modules
@@ -8,7 +8,7 @@ def pre_process_inference_images(images_npy_file, idtype, nlayers_max, prefix):
     from . import utils
 
     # Load the images
-    images = np.load(images_npy_file)
+    images = np.load(dir+'/'+images_npy_file)
 
     # Automatically scale the images
     images = utils.normalize_images(images,idtype)

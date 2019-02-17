@@ -1,4 +1,4 @@
-# This module should contain relatively simple functions that can be used for many image segmentation-related purposes
+# This module should contain relatively simple functions that can be used for multiple image segmentation-related purposes
 # "Compound" functions that call the functions in this script (among other things) should be part of other modules in the image_segmentation package
 
 def arr_info(arr):
