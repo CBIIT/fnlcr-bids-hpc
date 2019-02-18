@@ -54,17 +54,6 @@ def process_data_for_view(view_transpose_index,inference_on_dir,roi_num,model): 
 
     return(msk0,shp,img,msk1,img_rgba,msk0_rgba,msk1_rgba,metrics_2d,metrics_3d)
 
-def get_colored_str(x):
-    # Get HTML string that colors x according to its value so the table is colored
-    col = 'black'
-    if x >= 95:
-        col = 'green'
-    elif x >= 85:
-        col = 'orange'
-    elif x >= 75:
-        col = 'red'
-    numstr = '{: 4d}'.format(x)
-    return('<font style="color:'+col+';">'+numstr+'</font>')
 
 
 # Import relevant functions

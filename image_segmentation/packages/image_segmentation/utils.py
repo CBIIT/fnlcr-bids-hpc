@@ -58,6 +58,18 @@ def count(arr,twoD_stack_dim=-1):
         dims.remove(twoD_stack_dim)
         return(np.sum(arr,axis=tuple(dims)))
 
+def get_colored_str(x):
+    # Get HTML string that colors x according to its value so the table is colored
+    col = 'black'
+    if x >= 95:
+        col = 'green'
+    elif x >= 85:
+        col = 'orange'
+    elif x >= 75:
+        col = 'red'
+    numstr = '{: 4d}'.format(x)
+    return('<font style="color:'+col+';">'+numstr+'</font>')
+
 def gray2rgba(img,A=255,mycolor=[1,1,1],makeBGTransp=False):
     # By default, make the image not transparent at all, make the transparency color white, and don't make the 0-pixels transparent
     import numpy as np
