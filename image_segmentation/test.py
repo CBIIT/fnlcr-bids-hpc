@@ -4,7 +4,8 @@ sys.path.append('/home/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation/pac
 from image_segmentation import testing
 #testing.load_data()
 #testing.calculate_metrics()
-testing.output_metrics()
+#testing.output_metrics()
+#testing.make_plots()
 
 
 
