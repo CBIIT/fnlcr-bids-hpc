@@ -1,3 +1,5 @@
+# How to run CANDLE on Biowulf
+
 Workflow for running CANDLE job (always in a working directory [set to $WORKINGDIR, e.g., /home/weismanal/notebook/2019-01-28/jobs/candle], i.e., not in the candle code tree):
 
 1. Copy over the two necessary files:
