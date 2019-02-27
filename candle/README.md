@@ -6,7 +6,7 @@ Workflow for running CANDLE job (always in a working directory [set to $WORKINGD
 
 2. Make an unrolled parameter file, e.g.:
 
-  2a. Edit $WORKINGDIR/raw_params.txt to contain the "naked" parameters to be "clothed" in the unrolled parameter file we're about to make.  NOTE: This file format will be JSON so special Python variables (e.,g., True, False, None) must be in JSON format (e.g., true, false, null).  See e.g. https://docs.python.org/3/library/json.html#py-to-json-table.
+  2a. Edit $WORKINGDIR/raw_params.txt to contain the "naked" parameters to be "clothed" in the unrolled parameter file we're about to make.  NOTE: This file format will be JSON so special Python variables (e.,g., True, False, None) must be in JSON format (e.g., true, false, null).  See e.g. https://docs.python.org/3/library/json.html#py-to-json-table. Note also that double quotes must be used instead of single quotes!
 
   2b. Run a command like the following (which is the commented-out line in $EXAMPLEDIR/make_upf_file.sh) in order to "clothe" the raw parameters:
 
