@@ -63,31 +63,33 @@ for dir in $checkouts_dir/*; do
     # Pull any changes from the remote repository
     git pull
 
+    # Get the current repository name
+    repo="repository $(basename $dir)"
+
     # Optionally add untracked files
     if [ $(check_git_status "^Untracked files:$") -eq 1 ]; then
-        ask_to_do "Add untracked files (otherwise, update .gitignore)?" \
+        ask_to_do "Add untracked files to $repo (otherwise, update .gitignore)?" \
             "echo -e \"a\n*\nq\n\" | git add -i" \
             "echo -en \"Enter string to add to .gitignore: \"; read str; echo \$str >> .gitignore; git add .gitignore"
-            #"echo -e ""a\n"" | git add -i" \
     fi
 
     # Optionally stage files for commit
     if [ $(check_git_status "^Changes not staged for commit:$") -eq 1 ]; then
-        ask_to_do "Stage files for commit?" \
+        ask_to_do "Stage files for commit to $repo?" \
             "git add ." \
             ""
     fi
 
     # Optionally commit changes to the local repository
     if [ $(check_git_status "^Changes to be committed:$") -eq 1 ]; then
-        ask_to_do "Commit changes?" \
+        ask_to_do "Commit changes to $repo?" \
             "git commit" \
             ""
     fi
 
     # Optionally push commits to the remote repository
     if [ $(check_git_status "^Your branch is ahead of ") -eq 1 ]; then
-        ask_to_do "Push changes?" \
+        ask_to_do "Push changes to $repo?" \
             "git push" \
             ""
     fi
