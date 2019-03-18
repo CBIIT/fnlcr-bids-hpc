@@ -35,4 +35,5 @@ Submit the job by running, from the working directory,
 
 # Notes
 
-See the README [here](https://github.com/ECP-CANDLE/Supervisor/tree/develop/templates/README.md) for more details.
+* See `/data/BIDS-HPC/public/candle/examples/mnist_upf` for the exact run above using this as the working directory.
+* See the README [here](https://github.com/ECP-CANDLE/Supervisor/tree/develop/templates/README.md) for more details.
