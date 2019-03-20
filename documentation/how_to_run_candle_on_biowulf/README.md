@@ -2,10 +2,10 @@
 
 ## Step 1: Copy the submission script to a working directory
 
-For example, assuming your working directory is `/home/weismanal/notebook/2019-03-18/test3`, run this on Biowulf:
+For example, assuming your working directory is `/home/`whomami/candle-test`, run this on Biowulf:
 
 ```bash
-cd /home/weismanal/notebook/2019-03-18/test3
+cd /home/`whomami`/candle-test
 cp /data/BIDS-HPC/public/candle/Supervisor/templates/submit_candle_job.sh .
 ```
 
