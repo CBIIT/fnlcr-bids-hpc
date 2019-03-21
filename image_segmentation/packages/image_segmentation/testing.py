@@ -1,3 +1,27 @@
+def augment_images():
+    from .image_augmentation import augment_images
+    from skimage import io
+    import numpy as np
+
+    # (H,W,3)
+    # image = io.imread('/Users/weismanal/links/local/1-pre-processing/lady/lady.jpg')
+    # augment_images(image, do_composite=False)
+
+    # (N,H,W,3)
+    # images = np.load('/Users/weismanal/links/local/1-pre-processing/lady/lady_images_rgb_original_15.npy')
+    # augment_images(images, do_composite=True)
+
+    # (N,H,W,3) images and masks
+    # images = np.load('/Users/weismanal/links/local/1-pre-processing/lady/lady_images_rgb_original_15.npy')
+    # masks = np.load('/Users/weismanal/links/local/1-pre-processing/lady/lady_masks_original_15.npy')
+    # augment_images(images, masks=masks, do_composite=True)
+
+    # (N,H,W) images and masks
+    images = np.load('/Users/weismanal/links/local/1-pre-processing/lady/lady_images_rgb_original_15.npy')[:,:,:,0]
+    masks = np.load('/Users/weismanal/links/local/1-pre-processing/lady/lady_masks_original_15.npy')
+    augment_images(images, masks=masks, do_composite=True)
+
+
 def load_data():
 
     from .post_inference import load_images, load_inferred_masks

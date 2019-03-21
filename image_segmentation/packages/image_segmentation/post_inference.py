@@ -319,5 +319,5 @@ def prepare_for_plotting(image, do_transpose, scale, mycolor, makeBGTransp):
     image = np.expand_dims(image,0)
     if do_transpose:
         image = image.transpose((0,2,1))
-    image = utils.gray2rgba(image,A=scale*255,mycolor=mycolor,makeBGTransp=makeBGTransp)
+    image = utils.arr2rgba(image,A=scale*255,mycolor=mycolor,makeBGTransp=makeBGTransp)
     return(np.squeeze(image).astype('uint8'))

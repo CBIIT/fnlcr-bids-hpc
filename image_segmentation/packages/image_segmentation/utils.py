@@ -12,6 +12,49 @@ def arr_info(arr):
     print('Hist: ',hist)
     print('Edges: ',edges)
 
+def arr2rgba(arr,A=255,mycolor=[1,1,1],makeBGTransp=False):
+    # By default, make the image not transparent at all, make the transparency color white, and don't make the 0-pixels (of the first channel) transparent
+    # Fourth channel = 255 means no transparency (fully opaque); fourth channel = 0 means fully transparent
+    # Calling it "arr" to be clear that the input can be either an image or a mask
+    import numpy as np
+
+    # Ensure the shade color is a float
+    mycolor = np.array(mycolor,dtype='float32')
+    
+    # Preprocess the images so that they're uint8 and (N,H,W,C)
+    #rgba = np.expand_dims(arr,3) # (N,H,W) --> (N,H,W,1)
+    arr = normalize_images(arr,1) # ensure the images are uint8; inputs can therefore be [0,1], [0,2^8-1], or [0,2^16-1]
+    arr, __ = stack_and_color_images(arr) # (N,H,W) --> (N,H,W,1)... now arr is always going to be (N,H,W,C) no matter what the input format, which used to have to be (N,H,W)
+
+    # If gray, set the new array (rgba) to an RGB copy of it; otherwise (RGB), set the new array to a copy of it
+    # rgba = np.tile(rgba,(1,1,1,4)) # --> (N,H,W,4)
+    if arr.shape[3] == 1:
+        rgba = np.tile(arr,(1,1,1,3)) # --> (N,H,W,3)
+    else:
+        rgba = np.copy(arr) # --> (N,H,W,3)
+    
+    # Tack on the transparency array to the new array    
+    shp = list(rgba.shape[0:3])
+    shp.append(1)
+    transp = np.ones(tuple(shp),dtype='uint8') * A
+    rgba = np.concatenate((rgba,transp),axis=3)
+
+    # Blacken out the three channels according to mycolor (i.e., "shade" the array)
+    # mycolor=[1,1,1] leaves it unchanged
+    # mycolor=[0,0,0] makes it completely black
+    rgba[:,:,:,0] = (rgba[:,:,:,0]*mycolor[0]).astype('uint8')
+    rgba[:,:,:,1] = (rgba[:,:,:,1]*mycolor[1]).astype('uint8')
+    rgba[:,:,:,2] = (rgba[:,:,:,2]*mycolor[2]).astype('uint8')
+    #rgba[:,:,:,3] = A # A=255 means no transparency
+
+    # If set, if the first channel is zero, make the corresponding values completely transparent
+    if makeBGTransp:
+        bg0,bg1,bg2 = np.where(arr[:,:,:,0]==0)
+        rgba[bg0,bg1,bg2,3] = 0
+
+    # Return this new array
+    return(rgba)
+
 def calculate_metrics(msk0,msk1,twoD_stack_dim=-1):
     # Calculate how well the image segmentation task performed by comparing the inferred masks (msk1) to the known masks (msk0)
 
@@ -70,21 +113,6 @@ def get_colored_str(x):
     numstr = '{: 4d}'.format(x)
     return('<font style="color:'+col+';">'+numstr+'</font>')
 
-def gray2rgba(img,A=255,mycolor=[1,1,1],makeBGTransp=False):
-    # By default, make the image not transparent at all, make the transparency color white, and don't make the 0-pixels transparent
-    import numpy as np
-    mycolor = np.array(mycolor,dtype='float32')
-    tmp = np.expand_dims(img,3)
-    tmp = np.tile(tmp,(1,1,1,4))
-    tmp[:,:,:,0] = (tmp[:,:,:,0]*mycolor[0]).astype('uint8')
-    tmp[:,:,:,1] = (tmp[:,:,:,1]*mycolor[1]).astype('uint8')
-    tmp[:,:,:,2] = (tmp[:,:,:,2]*mycolor[2]).astype('uint8')
-    tmp[:,:,:,3] = A
-    if makeBGTransp:
-        bg0,bg1,bg2 = np.where(img==0)
-        tmp[bg0,bg1,bg2,3] = 0
-    return(tmp)
-
 def normalize_images(images,idtype):
     # Automatically detect the pixel range and scale the images to a new range specified by idtype
     import numpy as np
@@ -108,6 +136,15 @@ def normalize_images(images,idtype):
         arr_info(images)
         return(images)
         
+def overlay_images(rgba1, rgba2):
+    # Inputs are necessarily (N,H,W,4) and uint8 since they should be first run through arr2rgba()
+    # Returns (N,H,W,3) uint8
+    import numpy as np
+    rgb1 = rgba1[:,:,:,0:3]
+    rgb2 = rgba2[:,:,:,0:3]
+    transp = np.tile(np.expand_dims(rgba2[:,:,:,3],3),(1,1,1,3)) / 255
+    return( ( (1-transp)*rgb1 + transp*rgb2 ).astype('uint8') )
+
 def pad_images(images, nlayers):
     """
     In Unet, every layer the dimension gets divided by 2
@@ -121,6 +158,24 @@ def pad_images(images, nlayers):
     y_pad = int((math.ceil(y / float(divisor)) * divisor) - y)
     padded_image = np.pad(images, ((0,0),(0, x_pad), (0, y_pad)), 'constant', constant_values=(0, 0))
     return padded_image
+
+def stack_and_color_images(images, masks=None):
+    # images can be (H,W), (H,W,3), (N,H,W), or (N,H,W,3)
+    # masks can be (H,W) or (N,H,W)
+    # At the end of this function, images should be (N,H,W,C) and masks should be (N,H,W)
+    import numpy as np
+
+    # If images are not stacked...
+    if (images.ndim == 2) or (images.ndim==3 and images.shape[2]==3): # (H,W) or (H,W,C)
+        images = np.expand_dims(images,0)
+        if masks is not None:
+            masks = np.expand_dims(masks,0)
+
+    # If images are not colored...
+    if images.ndim == 3: # (N,H,W)
+        images = np.expand_dims(images,3)
+
+    return(images, masks)
 
 def transpose_stack(images):
     # Split the images into all three dimensions, making the other two dimensions of the images accessible
