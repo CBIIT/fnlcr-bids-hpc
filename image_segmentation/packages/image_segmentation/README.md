@@ -42,7 +42,7 @@ export IMGAUG=/data/BIDS-HPC/public/software/checkouts/imgaug
 In some working directory, e.g., `/data/weismanal/notebook/2019-03-21/testing_image_augmentation`, run the following:
 
 ```bash
-cp $IMAGE_SEG/image_augmentation_example.py .
+cp $IMAGE_SEG/image_segmentation/image_augmentation_example.py .
 # If on Biowulf: module load python/3.6
 python image_augmentation_example.py
 ```
