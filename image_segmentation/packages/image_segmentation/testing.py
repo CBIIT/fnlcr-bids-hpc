@@ -1,26 +1,34 @@
 def augment_images():
+
+    # See also image_augmentation_example.py and instructions on running it at https://cbiit.github.io/fnlcr-bids-hpc/image_segmentation/packages/image_segmentation/
+
     from .image_augmentation import augment_images
     from skimage import io
     import numpy as np
 
     # (H,W,3)
     # image = io.imread('/Users/weismanal/links/local/1-pre-processing/lady/lady.jpg')
-    # augment_images(image, do_composite=False)
+    # # print(type(augment_images(image, do_composite=False, output_dir='/Users/weismanal/notebook/2019-03-23/output')))
+    # # print(type(augment_images(image, num_aug=5, do_composite=False, output_dir='/Users/weismanal/notebook/2019-03-23/output')))
+    # print(type(augment_images(image, num_aug=1, do_composite=True, output_dir='/Users/weismanal/notebook/2019-03-23/output')))
+    # # print(type(augment_images(image, num_aug=25, do_composite=True, output_dir='/Users/weismanal/notebook/2019-03-23/output')))
+
 
     # (N,H,W,3)
     # images = np.load('/Users/weismanal/links/local/1-pre-processing/lady/lady_images_rgb_original_15.npy')
-    # augment_images(images, do_composite=True)
+    # #augment_images(images, do_composite=False, output_dir='/Users/weismanal/notebook/2019-03-23/output')
+    # #augment_images(images, num_aug=2, do_composite=False, output_dir='/Users/weismanal/notebook/2019-03-23/output')
+    # augment_images(images, num_aug=1, do_composite=True, output_dir='/Users/weismanal/notebook/2019-03-23/output')
 
     # (N,H,W,3) images and masks
     # images = np.load('/Users/weismanal/links/local/1-pre-processing/lady/lady_images_rgb_original_15.npy')
     # masks = np.load('/Users/weismanal/links/local/1-pre-processing/lady/lady_masks_original_15.npy')
-    # augment_images(images, masks=masks, do_composite=True)
+    # augment_images(images, masks=masks, do_composite=True, output_dir='/Users/weismanal/notebook/2019-03-23/output')
 
     # (N,H,W) images and masks
     images = np.load('/Users/weismanal/links/local/1-pre-processing/lady/lady_images_rgb_original_15.npy')[:,:,:,0]
     masks = np.load('/Users/weismanal/links/local/1-pre-processing/lady/lady_masks_original_15.npy')
-    augment_images(images, masks=masks, do_composite=True)
-
+    augment_images(images, masks=masks, do_composite=True, output_dir='/Users/weismanal/notebook/2019-03-23/output')
 
 def load_data():
 
