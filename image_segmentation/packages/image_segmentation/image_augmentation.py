@@ -94,9 +94,7 @@ def augment_images(images, masks=None, do_composite=True, imgaug_repo='/Users/we
     if output_dir is not None:
         io.imsave(output_dir+'/'+'input.tif',images)
         if masks is not None:
-            rgba1 = utils.arr2rgba(images,A=255,mycolor=[1,1,1],makeBGTransp=False)
-            rgba2 = utils.arr2rgba(masks,A=round(0.25*255),mycolor=[1,0,0],makeBGTransp=True)
-            io.imsave(output_dir+'/'+'input-overlay.tif',utils.overlay_images(rgba1, rgba2))
+            utils.quick_overlay_output(images, masks, output_dir+'/'+'input-overlay.tif')
 
     # If we want to do each augmentation individually in order to manually inspect exactly what each augmentation does...
     if not do_composite:
@@ -183,9 +181,7 @@ def augment_images(images, masks=None, do_composite=True, imgaug_repo='/Users/we
         if output_dir is not None:
             io.imsave(output_dir+'/'+'output.tif',image_aug)
             if do_masks:
-                rgba1 = utils.arr2rgba(image_aug,A=255,mycolor=[1,1,1],makeBGTransp=False)
-                rgba2 = utils.arr2rgba(mask_aug,A=round(0.25*255),mycolor=[1,0,0],makeBGTransp=True)
-                io.imsave(output_dir+'/'+'output-overlay.tif',utils.overlay_images(rgba1, rgba2))
+                utils.quick_overlay_output(image_aug, mask_aug, output_dir+'/'+'output-overlay.tif')
 
         # Return the augmented images (and masks if they were input)
         if not do_masks:
