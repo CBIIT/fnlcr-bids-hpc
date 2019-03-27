@@ -4,6 +4,7 @@
 def arr_info(arr):
     # Print information about a numpy array
     import numpy as np
+    print('-------------- Printing array info of numpy array --------------')
     print('Shape: ',arr.shape)
     print('dtype: ',arr.dtype)
     print('Min: ',np.min(arr))
@@ -127,11 +128,11 @@ def normalize_images(images,idtype):
             break
         range_min = range_max
     if not found:
-        print('No range found')
+        print('\nNo range found')
         print(median)
         return(-1)
     else:
-        print('Range found; median is ',median,' and range max is ',range_max)
+        print('\nRange found; median is ',median,' and range max is ',range_max)
         images = ( images.astype('float32') / range_max * possible_range_maxs[idtype] ).astype(possible_range_dtypes[idtype])
         arr_info(images)
         return(images)
@@ -158,6 +159,13 @@ def pad_images(images, nlayers):
     y_pad = int((math.ceil(y / float(divisor)) * divisor) - y)
     padded_image = np.pad(images, ((0,0),(0, x_pad), (0, y_pad)), 'constant', constant_values=(0, 0))
     return padded_image
+
+def quick_overlay_output(images, masks, overlay_tif_path):
+    from skimage import io
+    rgba1 = arr2rgba(images,A=255,mycolor=[1,1,1],makeBGTransp=False)
+    rgba2 = arr2rgba(masks,A=round(0.25*255),mycolor=[1,0,0],makeBGTransp=True)
+    io.imsave(overlay_tif_path,overlay_images(rgba1, rgba2))
+
 
 def stack_and_color_images(images, masks=None):
     # images can be (H,W), (H,W,3), (N,H,W), or (N,H,W,3)
