@@ -24,5 +24,5 @@ from image_segmentation import testing
 
 # # Make the data RGBA
 # images_rgba = imseg_utils.gray2rgba(images)
-# known_masks_rgba = imseg_utils.gray2rgba(known_masks,A=0.2*255,mycolor=[0,0,1],makeBGTransp=True)
-# inferred_masks_rgba = imseg_utils.gray2rgba(inferred_masks,A=0.2*255,mycolor=[1,0,0],makeBGTransp=True)
+# known_masks_rgba = imseg_utils.gray2rgba(known_masks,A=0.2*255,shade_color=[0,0,1],makeBGTransp=True)
+# inferred_masks_rgba = imseg_utils.gray2rgba(inferred_masks,A=0.2*255,shade_color=[1,0,0],makeBGTransp=True)

@@ -1,10 +1,10 @@
 # This module should contain relatively simple functions that can be used for multiple image segmentation-related purposes
 # "Compound" functions that call the functions in this script (among other things) should be part of other modules in the image_segmentation package
 
-def arr_info(arr):
+def arr_info(arr,mystr=''):
     # Print information about a numpy array
     import numpy as np
-    print('-------------- Printing array info of numpy array --------------')
+    print('-------------- '+mystr+'Printing array info of numpy array --------------')
     print('Shape: ',arr.shape)
     print('dtype: ',arr.dtype)
     print('Min: ',np.min(arr))
@@ -13,18 +13,18 @@ def arr_info(arr):
     print('Hist: ',hist)
     print('Edges: ',edges)
 
-def arr2rgba(arr,A=255,mycolor=[1,1,1],makeBGTransp=False):
+def arr2rgba(arr,A=255,shade_color=[1,1,1],makeBGTransp=False):
     # By default, make the image not transparent at all, make the transparency color white, and don't make the 0-pixels (of the first channel) transparent
     # Fourth channel = 255 means no transparency (fully opaque); fourth channel = 0 means fully transparent
     # Calling it "arr" to be clear that the input can be either an image or a mask
     import numpy as np
 
     # Ensure the shade color is a float
-    mycolor = np.array(mycolor,dtype='float32')
+    shade_color = np.array(shade_color,dtype='float32')
     
     # Preprocess the images so that they're uint8 and (N,H,W,C)
     #rgba = np.expand_dims(arr,3) # (N,H,W) --> (N,H,W,1)
-    arr = normalize_images(arr,1) # ensure the images are uint8; inputs can therefore be [0,1], [0,2^8-1], or [0,2^16-1]
+    arr = normalize_images(arr,1,do_output=False) # ensure the images are uint8; inputs can therefore be [0,1], [0,2^8-1], or [0,2^16-1]
     arr, __ = stack_and_color_images(arr) # (N,H,W) --> (N,H,W,1)... now arr is always going to be (N,H,W,C) no matter what the input format, which used to have to be (N,H,W)
 
     # If gray, set the new array (rgba) to an RGB copy of it; otherwise (RGB), set the new array to a copy of it
@@ -37,15 +37,15 @@ def arr2rgba(arr,A=255,mycolor=[1,1,1],makeBGTransp=False):
     # Tack on the transparency array to the new array    
     shp = list(rgba.shape[0:3])
     shp.append(1)
-    transp = np.ones(tuple(shp),dtype='uint8') * A
+    transp = np.ones(tuple(shp),dtype='uint8') * int(A)
     rgba = np.concatenate((rgba,transp),axis=3)
 
-    # Blacken out the three channels according to mycolor (i.e., "shade" the array)
-    # mycolor=[1,1,1] leaves it unchanged
-    # mycolor=[0,0,0] makes it completely black
-    rgba[:,:,:,0] = (rgba[:,:,:,0]*mycolor[0]).astype('uint8')
-    rgba[:,:,:,1] = (rgba[:,:,:,1]*mycolor[1]).astype('uint8')
-    rgba[:,:,:,2] = (rgba[:,:,:,2]*mycolor[2]).astype('uint8')
+    # Blacken out the three channels according to shade_color (i.e., "shade" the array)
+    # shade_color=[1,1,1] leaves it unchanged
+    # shade_color=[0,0,0] makes it completely black
+    rgba[:,:,:,0] = (rgba[:,:,:,0]*shade_color[0]).astype('uint8')
+    rgba[:,:,:,1] = (rgba[:,:,:,1]*shade_color[1]).astype('uint8')
+    rgba[:,:,:,2] = (rgba[:,:,:,2]*shade_color[2]).astype('uint8')
     #rgba[:,:,:,3] = A # A=255 means no transparency
 
     # If set, if the first channel is zero, make the corresponding values completely transparent
@@ -114,28 +114,67 @@ def get_colored_str(x):
     numstr = '{: 4d}'.format(x)
     return('<font style="color:'+col+';">'+numstr+'</font>')
 
-def normalize_images(images,idtype):
+def normalize_images_orig(images,idtype,do_output=True):
     # Automatically detect the pixel range and scale the images to a new range specified by idtype
     import numpy as np
     possible_range_maxs = [1,2**8-1,2**16-1]
     possible_range_dtypes = ['float32','uint8','uint16']
     median = np.median(images)
+    if do_output:
+        print('')
+        arr_info(images,mystr="BEFORE: ")
     found = False
     range_min = 0
     for range_max in possible_range_maxs:
-        if (median>=range_min) & (median<=range_max):
+        if (median>=range_min) and (median<=range_max):
             found = True
             break
         range_min = range_max
     if not found:
-        print('\nNo range found')
+        print('No range found')
         print(median)
+        arr_info(images)
         return(-1)
     else:
-        print('\nRange found; median is ',median,' and range max is ',range_max)
-        images = ( images.astype('float32') / range_max * possible_range_maxs[idtype] ).astype(possible_range_dtypes[idtype])
+        if do_output:
+            print('Range found; median is ',median,' and range max is ',range_max)
+        images2 = ( images.astype('float32') / range_max * possible_range_maxs[idtype] ).astype(possible_range_dtypes[idtype])
+        if do_output:
+            if (images2==images).all():
+                print('UNCHANGED')
+            else:
+                arr_info(images2,mystr="AFTER: ")
+        return(images2)
+        
+def normalize_images(images,idtype,do_output=True):
+    # Automatically detect the pixel range and scale the images to a new range specified by idtype
+    import numpy as np
+    possible_range_maxs = [1,2**8-1,2**16-1]
+    possible_range_dtypes = ['float32','uint8','uint16']
+    mymax = np.max(images)
+    if do_output:
+        print('')
+        arr_info(images,mystr="BEFORE: ")
+    found = False
+    for range_max in possible_range_maxs:
+        if mymax <= range_max:
+            found = True
+            break
+    if not found:
+        print('No range found')
+        print(mymax)
         arr_info(images)
-        return(images)
+        return(-1)
+    else:
+        if do_output:
+            print('Range found; max is ',mymax,' and range max is ',range_max)
+        images2 = ( images.astype('float32') / range_max * possible_range_maxs[idtype] ).astype(possible_range_dtypes[idtype])
+        if do_output:
+            if (images2==images).all():
+                print('UNCHANGED')
+            else:
+                arr_info(images2,mystr="AFTER: ")
+        return(images2)
         
 def overlay_images(rgba1, rgba2):
     # Inputs are necessarily (N,H,W,4) and uint8 since they should be first run through arr2rgba()
@@ -162,10 +201,9 @@ def pad_images(images, nlayers):
 
 def quick_overlay_output(images, masks, overlay_tif_path):
     from skimage import io
-    rgba1 = arr2rgba(images,A=255,mycolor=[1,1,1],makeBGTransp=False)
-    rgba2 = arr2rgba(masks,A=round(0.25*255),mycolor=[1,0,0],makeBGTransp=True)
+    rgba1 = arr2rgba(images,A=255,shade_color=[1,1,1],makeBGTransp=False)
+    rgba2 = arr2rgba(masks,A=round(0.25*255),shade_color=[1,0,0],makeBGTransp=True)
     io.imsave(overlay_tif_path,overlay_images(rgba1, rgba2))
-
 
 def stack_and_color_images(images, masks=None):
     # images can be (H,W), (H,W,3), (N,H,W), or (N,H,W,3)
