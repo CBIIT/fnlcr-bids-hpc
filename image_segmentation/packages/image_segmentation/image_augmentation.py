@@ -166,7 +166,8 @@ def augment_images(images, masks=None, do_composite=True, imgaug_repo='/Users/we
                 img_channels.append(seq_det.augment_image(images[i,:,:,ic].squeeze()))
             image_aug.append(img_channels)
             if do_masks:
-                mask_segmap = ia.SegmentationMapOnImage(masks[i,:,:].squeeze(),shape=(H,W),nb_classes=2)
+                #mask_segmap = ia.SegmentationMapOnImage(masks[i,:,:].squeeze(),shape=(H,W),nb_classes=2)
+                mask_segmap = ia.SegmentationMapOnImage(masks[i,:,:].squeeze(),shape=(H,W),nb_classes=np.max(masks[i,:,:])+1)
                 mask_aug.append(seq_det.augment_segmentation_maps([mask_segmap])[0].get_arr_int())
 
         # Convert the lists to numpy arrays

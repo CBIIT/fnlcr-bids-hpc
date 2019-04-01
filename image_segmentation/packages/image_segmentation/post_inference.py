@@ -21,7 +21,7 @@ def load_inferred_masks(roi, unpadded_shape, models, inference_directions, dir='
     dirs = ['x','y','z']
 
     # Load, undo stack transpose on, round, remove padding from, and normalize the inferred masks
-    inferred_masks = np.zeros(tuple([len(models),len(inference_directions)]+list(unpadded_shape)))
+    inferred_masks = np.zeros(tuple([len(models),len(inference_directions)]+list(unpadded_shape)), dtype='uint8')
     for imodel, model in enumerate(models):
         for iinfdir, inference_direction in enumerate(inference_directions):
             dir_index = dirs.index(inference_direction)
@@ -33,7 +33,7 @@ def load_inferred_masks(roi, unpadded_shape, models, inference_directions, dir='
 
     return(inferred_masks)
 
-def calculate_metrics(known_masks_list, inferred_masks_list):
+def calculate_metrics(known_masks_list, inferred_masks_list, nviews=None):
     # Calculate the metrics (see calculate_metrics() in the utils module) for every model and inference direction 
     # This is tested in its own function of the testing module
 
@@ -49,7 +49,8 @@ def calculate_metrics(known_masks_list, inferred_masks_list):
         nmodels = inferred_masks.shape[0]
         ninfdir = inferred_masks.shape[1]
         max_stack_size = max(known_masks.shape)
-        nviews = ninfdir
+        if nviews is None:
+            nviews = ninfdir
 
         # Constant
         nmetrics = 5
@@ -79,12 +80,17 @@ def calculate_metrics(known_masks_list, inferred_masks_list):
 
     return(metrics_2d_list, metrics_3d_list)
 
-def output_metrics(metrics_3d_list, roi_list, models):
+def output_metrics(metrics_3d_list, roi_list, models, new_names=None):
     # This is tested in its own function of the testing module
 
     # Import relevant modules
     import numpy as np
     from . import utils
+
+    if new_names is not None:
+        is_aggregate = True
+    else:
+        is_aggregate = False
 
     # Open files for writing and write the introductory HTML
     text_file = open('metrics_3d.txt','a')
@@ -105,7 +111,12 @@ def output_metrics(metrics_3d_list, roi_list, models):
         for imodel in range(nmodels):
             model_num = int(models[imodel].split('-',1)[0])
             for iinfdir in range(ninfdir):
-                string = str(model_num) + '\t' + str(iinfdir) + '\t' + str(roi_num) + '\t'
+
+                if not is_aggregate:
+                    string = str(model_num) + '\t' + str(iinfdir) + '\t' + str(roi_num) + '\t'
+                else:
+                    string = str(model_num) + '\t' + '-' + str(iinfdir) + '\t' + str(roi_num) + '\t'
+
                 for imetric in range(nmetrics):
                     string = string + str(metrics_3d[imodel,iinfdir,imetric])
                     if not imetric == (nmetrics-1):
@@ -119,18 +130,35 @@ def output_metrics(metrics_3d_list, roi_list, models):
         html_file.write('                         |     TPR     |     TNR     |     PPV     |    BACC     |     F1      |\n')
         html_file.write('------------------------------------------------------------------------------------------------')
         for imodel in range(nmodels):
-            html_file.write('\n '+'{:23}'.format(models[imodel])+' |')
-            for imetric in range(nmetrics):
-                string = ''
+
+            if not is_aggregate:
+
+                html_file.write('\n '+'{:23}'.format(models[imodel])+' |')
+                for imetric in range(nmetrics):
+                    string = ''
+                    for iinfdir in range(ninfdir):
+                        score = np.round(metrics_3d[imodel,iinfdir,imetric]*100).astype('uint8')
+                        score_str = utils.get_colored_str(score)
+                        string = string + score_str
+                    if ninfdir == 3:
+                        html_file.write(string+' |')
+                    else:
+                        html_file.write('    '+string+'     |')
+                string = string + '\n'
+
+            else:
+
+                model_num_str = models[imodel].split('-',1)[0]
                 for iinfdir in range(ninfdir):
-                    score = np.round(metrics_3d[imodel,iinfdir,imetric]*100).astype('uint8')
-                    score_str = utils.get_colored_str(score)
-                    string = string + score_str
-                if ninfdir == 3:
-                    html_file.write(string+' |')
-                else:
-                    html_file.write('    '+string+'     |')
-            string = string + '\n'
+                    html_file.write('\n '+'{:23}'.format(model_num_str+'-'+new_names[iinfdir])+' |')
+                    for imetric in range(nmetrics):
+                        string = ''
+                        score = np.round(metrics_3d[imodel,iinfdir,imetric]*100).astype('uint8')
+                        score_str = utils.get_colored_str(score)
+                        string = string + score_str
+                        html_file.write('    '+string+'     |')
+                    string = string + '\n'
+
         html_file.write('\n\n\n\n')
 
     # Write closing HTML and close files
@@ -138,19 +166,7 @@ def output_metrics(metrics_3d_list, roi_list, models):
     html_file.close()
     text_file.close()
 
-def prepare_for_plotting(image, do_transpose, scale, mycolor, makeBGTransp):
-    '''
-    Transpose images for easier visualization (if required) and convert them to RGBA images
-    '''
-    from . import utils
-    import numpy as np
-    image = np.expand_dims(image,0)
-    if do_transpose:
-        image = image.transpose((0,2,1))
-    image = utils.arr2rgba(image,A=scale*255,mycolor=mycolor,makeBGTransp=makeBGTransp)
-    return(np.squeeze(image).astype('uint8'))
-
-def make_movies(roi_list, images_list, inferred_masks_list, models, nframes=40, known_masks_list=None, metrics_2d_list=None, metrics_3d_list=None, framerate=2, delete_frames=True):
+def make_movies(roi_list, images_list, inferred_masks_list, models, nframes=40, known_masks_list=None, metrics_2d_list=None, metrics_3d_list=None, framerate=2, delete_frames=True, ffmpeg_preload_string='module load FFmpeg; '):
     # This is tested in its own function of the testing module
 
     # Import relevant modules
@@ -193,12 +209,10 @@ def make_movies(roi_list, images_list, inferred_masks_list, models, nframes=40, 
 
         # For every model...
         for imodel in range(nmodels):
-
             print('On model '+str(imodel+1)+' of '+str(nmodels)+' ('+models[imodel]+')')
 
             # For every view...
             for iview in range(nviews):
-
                 print('  On view '+str(iview+1)+' of '+str(nviews))
 
                 # Clear the figure if it exists
@@ -273,45 +287,18 @@ def make_movies(roi_list, images_list, inferred_masks_list, models, nframes=40, 
 
                 # Now plot the frame-dependent data and metrics...for every frame...
                 for frame in np.linspace(0,curr_stack_size-1,num=nframes).astype('uint16'):
-
                     print('    On frame '+str(frame+1)+' in '+str(curr_stack_size))
 
                     # Set variables that are the same for each inference direction: curr_images_frame, (curr_known_masks_frame)
-                    #curr_images_frame = prepare_for_plotting(curr_images[frame,:,:],do_transpose_for_view[iview],1,[1,1,1],False)
                     curr_images_frame = np.transpose(np.squeeze(utils.arr2rgba(curr_images[frame,:,:],A=1*255,shade_color=[1,1,1],makeBGTransp=False)),rotate_2d)
-
-                    #utils.arr_info(curr_images_frame) # it's all fine
-                    # utils.arr_info(curr_images_frame[:,:,0])
-                    # utils.arr_info(curr_images_frame[:,:,1])
-                    # utils.arr_info(curr_images_frame[:,:,2])
-                    # utils.arr_info(curr_images_frame[:,:,3])
-
                     if truth_known:
-
-                        #utils.arr_info(curr_known_masks[frame,:,:])
-
-                        #curr_known_masks_frame = prepare_for_plotting(curr_known_masks[frame,:,:],do_transpose_for_view[iview],0.2,[0,0,1],True)
                         curr_known_masks_frame = np.transpose(np.squeeze(utils.arr2rgba(curr_known_masks[frame,:,:],A=0.2*255,shade_color=[0,0,1],makeBGTransp=True)),rotate_2d)
-
-                        #utils.arr_info(curr_known_masks_frame) # it's fixed now
-                        # utils.arr_info(curr_known_masks_frame[:,:,0])
-                        # utils.arr_info(curr_known_masks_frame[:,:,1])
-                        # utils.arr_info(curr_known_masks_frame[:,:,2])
-                        # utils.arr_info(curr_known_masks_frame[:,:,3])
 
                     # Set variables that are different for each inference direction (ax_images, (ax_metrics), curr_inferred_masks_infdir_frame, (curr_metrics_2d_infdir_frame)) and do the plotting
                     iinfdir = 0
                     temporary_plots = []
                     for ax_images, curr_inferred_masks_infdir in zip(axes_images,curr_inferred_masks):
-                        #curr_inferred_masks_infdir_frame = prepare_for_plotting(curr_inferred_masks_infdir[frame,:,:],do_transpose_for_view[iview],0.2,[1,0,0],True)
                         curr_inferred_masks_infdir_frame = np.transpose(np.squeeze(utils.arr2rgba(curr_inferred_masks_infdir[frame,:,:],A=0.2*255,shade_color=[1,0,0],makeBGTransp=True)),rotate_2d)
-
-                        #utils.arr_info(curr_inferred_masks_infdir_frame) # it's messed up in the above line
-                        # utils.arr_info(curr_inferred_masks_infdir_frame[:,:,0])
-                        # utils.arr_info(curr_inferred_masks_infdir_frame[:,:,1])
-                        # utils.arr_info(curr_inferred_masks_infdir_frame[:,:,2])
-                        # utils.arr_info(curr_inferred_masks_infdir_frame[:,:,3])
-
                         temporary_plots.append(ax_images.imshow(curr_images_frame))
                         temporary_plots.append(ax_images.imshow(curr_inferred_masks_infdir_frame))
                         if truth_known:
@@ -333,7 +320,7 @@ def make_movies(roi_list, images_list, inferred_masks_list, models, nframes=40, 
                 frame_glob = 'movies/'+roi+'__model_'+models[imodel]+'__view_'+labels_views[iview]+'__frame_'+'*'+'.png'
 
                 # Create the movies
-                os.system('module load FFmpeg; ' + 'ffmpeg -r '+str(framerate)+' -pattern_type glob -i "'+frame_glob+'" -c:v libx264 -crf 23 -profile:v baseline -level 3.0 -pix_fmt yuv420p -c:a aac -ac 2 -b:a 128k -movflags faststart ' + 'movies/'+roi+'__model_'+models[imodel]+'__view_'+labels_views[iview]+'.mp4')
+                os.system(ffmpeg_preload_string + 'ffmpeg -r '+str(framerate)+' -pattern_type glob -i "'+frame_glob+'" -c:v libx264 -crf 23 -profile:v baseline -level 3.0 -pix_fmt yuv420p -c:a aac -ac 2 -b:a 128k -movflags faststart ' + 'movies/'+roi+'__model_'+models[imodel]+'__view_'+labels_views[iview]+'.mp4')
 
                 # Unless otherwise specified, delete the frames
                 if delete_frames:
