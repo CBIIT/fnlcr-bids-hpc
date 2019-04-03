@@ -153,10 +153,16 @@ def get_new_masks(inferred_masks_list):
                 new_masks[imodel,offset+0,:,:,:] = new_masks_one
                 new_names.append(seed_str+'-'+'seed_only')
 
-                # Run the plane copy method using three different settings to produce three different sets (of three) masks (the two "threes" here are independent of each other)
-                new_masks_three_list = []
-                for copy_type in copy_types:
-                    new_masks_three_list.append(plane_copy(masks, seed, copy_type=copy_type)) # plane copy should send back an array of dimensions [3,X,Y,Z], just like inferred_masks[imodel,:,:,:,:] above
+                # Run the plane copy method and for each view combine the plane copies three different ways
+                plane_copies = plane_copy(masks, seed) # [3,3,Z,X,Y] (bool)
+                new_masks_three_list = [plane_copies[:,0,:,:,:]]
+                new_masks_three_list.append(plane_copies[:,1,:,:,:] | plane_copies[:,2,:,:,:])
+                new_masks_three_list.append(plane_copies[:,1,:,:,:] & plane_copies[:,2,:,:,:])
+
+                # # Run the plane copy method using three different settings to produce three different sets (of three) masks (the two "threes" here are independent of each other)
+                # new_masks_three_list = []
+                # for copy_type in copy_types:
+                #     new_masks_three_list.append(plane_copy(masks, seed)) # plane copy should send back an array of dimensions [3,Z,X,Y], just like inferred_masks[imodel,:,:,:,:] above
 
                 # For each of three sets of plane copy results ("three"), combine them in three different ways to result in a single set of masks ("one")
                 for offset_index, new_masks_three in enumerate(new_masks_three_list):
@@ -617,3 +623,101 @@ def main():
                 plt.savefig(fn,dpi='figure')
                 #plt.show()
             #plt.savefig('test.png',dpi='figure')
+
+def plane_copy(masks, seed_tuple):
+    # plane copy should send back an array of dimensions [3,Z,X,Y], just like inferred_masks[imodel,:,:,:,:] above
+    # inferred_masks[imodel,iinfdir,:,:,:]
+    # masks = inferred_masks[imodel,:,:,:,:].astype('bool') --> [3,Z,X,Y] (bool)
+    # sums = np.sum(masks, axis=0).astype('uint8') --> [Z,X,Y] (uint8)
+    # seed_tuple ~ np.asarray(sums>=2).nonzero() --> (Z,X,Y) (tuple of arrays) (int64) --> goes into something of dimensions [Z,X,Y] like myarr[seed_tuple]
+    # iview linearly (0,1,2) refers to the (z,x,y) directions, respectively
+
+    # Import relevant modules
+    import numpy as np
+
+    # Constants
+    transpose_indices = ((0,1,2),(1,2,0),(2,0,1)) # corresponds to z, x, y as for other iview-dependent variables
+    reverse_transpose_indices = ((0,1,2),(2,0,1),(1,2,0)) # corresponds to z, x, y --> iview-dependent in this case
+    par_ind = (2,0,1) # we get this from the index order of z, x, y
+
+    # Define the seed of the same shape as the masks (instead of a tuple of arrays)
+    shp = masks.shape
+    seed = np.zeros((shp[1],shp[2],shp[3]),dtype='bool')
+    seed[seed_tuple] = True # [Z,X,Y] (bool)
+
+    # Initialize the plane-copy-holding variable of interest
+    tmp = list(shp)
+    tmp.insert(1,3)
+    plane_copies = np.zeros(tuple(tmp),dtype='bool') # [3,3,Z,X,Y] --> the first "3" is the view index iview; the second "3" corresponds to the parallel, orth1, and orth2 inferences, respectively
+
+    # For each view in z, x, y order...
+    for iview in range(3):
+
+        # Get the transpose indices corresponding to the four-dimensional masks array
+        tr_ind = list(np.array(transpose_indices[iview])+1)
+        tr_ind.insert(0,0)
+
+        # Transpose the arrays of interest so that, for iview = 0,1,2, they are in [Z,X,Y], [X,Y,Z], [Y,Z,X] order
+        masks_tr = masks.transpose(tuple(tr_ind))
+        seed_tr = seed.transpose(transpose_indices[iview])
+
+        # Get the orthogonal indices since we know which index is the parallel index (terminology note: parallel/orthogonal describes how the inference direction relates to the current view)
+        orth_ind = np.setdiff1d((0,1,2),par_ind[iview])
+
+        # Determine the masks corresponding to inference directions that are parallel and orthogonal to the current view
+        masks_par = masks_tr[par_ind[iview],:,:,:]
+        masks_orth1 = masks_tr[orth_ind[0],:,:,:]
+        masks_orth2 = masks_tr[orth_ind[1],:,:,:]
+
+
+        # Compare the plane copies with the previous method
+        # from . import utils
+        # utils.arr_info(copy_planes(masks_par, seed_tr))
+        # utils.arr_info(fill_out_msk(masks_par, seed_tr))
+        # print((copy_planes(masks_par, seed_tr) == fill_out_msk(masks_par, seed_tr).astype('bool')).all())
+        # print((copy_planes(masks_orth1, seed_tr) == fill_out_msk(masks_orth1, seed_tr).astype('bool')).all())
+        # print((copy_planes(masks_orth2, seed_tr) == fill_out_msk(masks_orth2, seed_tr).astype('bool')).all())
+
+
+        # Calculate the plane copies
+        plane_copies[iview,0,:,:,:] = copy_planes(masks_par, seed_tr).transpose(reverse_transpose_indices[iview])
+        plane_copies[iview,1,:,:,:] = copy_planes(masks_orth1, seed_tr).transpose(reverse_transpose_indices[iview])
+        plane_copies[iview,2,:,:,:] = copy_planes(masks_orth2, seed_tr).transpose(reverse_transpose_indices[iview])
+
+    return(plane_copies)
+
+def copy_planes(masks, seed):
+
+    # Import relevant modules
+    from skimage.measure import label
+    import numpy as np
+
+    # Define the return variable
+    copies = np.zeros(masks.shape,dtype='bool')
+
+    # For each frame indicated by the first dimension of masks/seed...
+    for iframe in range(masks.shape[0]):
+        #curr_masks = masks[iframe,:,:].astype('uint8')
+        #curr_seed = seed[iframe,:,:].astype('uint8')
+        #curr_seed = seed[iframe,:,:]
+
+        # Determine the connected regions within the masks
+        mask_labels, nlabels = label(masks[iframe,:,:].astype('uint8'), return_num=True)
+        #print(nlabels)
+
+        # For each determined non-background patch...
+        copies_frame = np.zeros(mask_labels.shape,dtype='bool')
+        for ilabel in range(nlabels):
+            patch = mask_labels == (ilabel+1)
+            #if np.sum(patch.astype('uint8')*curr_seed) != 0:
+            #if np.sum(patch & curr_seed) != 0:
+
+            # If the patch overlaps with a seed pixel, assume the current patch is a valid patch
+            if np.sum(patch & seed[iframe,:,:]) != 0:
+                copies_frame[patch] = True
+        
+        # Save all the valid patches for each frame
+        copies[iframe,:,:] = copies_frame
+    
+    # Return the valid patches
+    return(copies)

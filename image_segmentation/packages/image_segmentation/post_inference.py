@@ -127,13 +127,13 @@ def output_metrics(metrics_3d_list, roi_list, models, new_names=None):
 
         # Write the HTML file output for the current ROI
         html_file.write('++++ ROI'+str(roi_num)+' ++++\n\n\n')
-        html_file.write('                         |     TPR     |     TNR     |     PPV     |    BACC     |     F1      |\n')
-        html_file.write('------------------------------------------------------------------------------------------------')
+        html_file.write('                                     |     TPR     |     TNR     |     PPV     |    BACC     |     F1      |\n')
+        html_file.write('------------------------------------------------------------------------------------------------------------')
         for imodel in range(nmodels):
 
             if not is_aggregate:
 
-                html_file.write('\n '+'{:23}'.format(models[imodel])+' |')
+                html_file.write('\n '+'{:35}'.format(models[imodel])+' |')
                 for imetric in range(nmetrics):
                     string = ''
                     for iinfdir in range(ninfdir):
@@ -150,7 +150,7 @@ def output_metrics(metrics_3d_list, roi_list, models, new_names=None):
 
                 model_num_str = models[imodel].split('-',1)[0]
                 for iinfdir in range(ninfdir):
-                    html_file.write('\n '+'{:23}'.format(model_num_str+'-'+new_names[iinfdir])+' |')
+                    html_file.write('\n '+'{:35}'.format(model_num_str+'-'+new_names[iinfdir])+' |')
                     for imetric in range(nmetrics):
                         string = ''
                         score = np.round(metrics_3d[imodel,iinfdir,imetric]*100).astype('uint8')
