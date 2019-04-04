@@ -1,7 +1,7 @@
 # In Bash (only on Biowulf): module load python/3.6
 import sys
-sys.path.append('/home/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation/packages') # only on Biowulf
-#sys.path.append('/Users/weismanal/checkouts/fnlcr-bids-hpc/image_segmentation/packages') # only on laptop
+#sys.path.append('/home/weismanal/checkouts/fnlcr-bids-hpc') # only on Biowulf
+#sys.path.append('/Users/weismanal/checkouts/fnlcr-bids-hpc') # only on laptop
 from image_segmentation import testing
 
 # Test the helper functions in the testing module
@@ -18,7 +18,7 @@ from image_segmentation import testing
 #testing.testing__post_inference__make_movies_individual_masks()
 
 # Test the aggregate_masks module
-testing.testing__aggregate_masks__copy_planes()
+#testing.testing__aggregate_masks__copy_planes()
 #testing.testing__aggregate_masks__get_plane_copies()
 #testing.testing__aggregate_masks__generate_aggregate_masks()
 #testing.testing__aggregate_masks__make_movies_aggregate_masks()
