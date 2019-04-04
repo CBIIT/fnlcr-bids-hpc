@@ -45,16 +45,18 @@ def testing__image_augmentation__augment_images():
     from skimage import io
     import numpy as np
     from . import utils
+    import os
 
     # Constant
     imgaug_path = '/data/BIDS-HPC/public/software/checkouts/imgaug'
+    curr_dir = os.path.dirname(os.path.realpath(__file__))
 
     # Input image definitions
-    lady_single_rgb = io.imread('sample_data/lady_rgb.jpg') # (H,W,3)
-    lady_stack_rgb = np.load('sample_data/lady_images_rgb_original_15.npy') # (N,H,W,3)
+    lady_single_rgb = io.imread(curr_dir + '/sample_data/lady_rgb.jpg') # (H,W,3)
+    lady_stack_rgb = np.load(curr_dir + '/sample_data/lady_images_rgb_original_15.npy') # (N,H,W,3)
     lady_single_gray = lady_single_rgb[:,:,0] # (H,W)
     lady_stack_gray = lady_stack_rgb[:,:,:,0] # (N,H,W)
-    lady_stack_masks = np.load('sample_data/lady_masks_original_15.npy') # (N,H,W)
+    lady_stack_masks = np.load(curr_dir + '/sample_data/lady_masks_original_15.npy') # (N,H,W)
 
     # Augment images only
     mydir = 'augmented_images_only'
@@ -106,7 +108,8 @@ def testing__post_inference__load_inferred_masks():
         inferred_masks_list.append(load_inferred_masks(roi, np.load(data_dir+'/'+roi+'_input_img.npy').shape, models, inference_directions, data_dir, do_output=False)) # these are ultimately uint8
 
     # Check output by eye
-    print(inferred_masks_list[0])
+    from . import utils
+    utils.arr_info(inferred_masks_list[0])
 
 def testing__post_inference__calculate_metrics():
     # Tests post_inference.calculate_metrics()
@@ -157,7 +160,8 @@ def testing__aggregate_masks__copy_planes():
     plane_copy = copy_planes(inferred_masks_list[0][0,0,:,:,:], inferred_masks_list[0][0,0,:,:,:] & inferred_masks_list[0][0,1,:,:,:] & inferred_masks_list[0][0,2,:,:,:]) # copy_planes(masks, seed)
 
     # Check by eye
-    print(plane_copy)
+    from . import utils
+    utils.arr_info(plane_copy)
 
 def testing__aggregate_masks__get_plane_copies():
     # Tests aggregate_masks.get_plane_copies()
@@ -172,7 +176,8 @@ def testing__aggregate_masks__get_plane_copies():
     plane_copies = get_plane_copies(masks, np.where(np.sum(masks, axis=0).astype('uint8')>=2)) # [3,3,Z,X,Y] (bool); get_plane_copies(masks, seed_tuple)
 
     # Check by eye
-    print(plane_copies)
+    from . import utils
+    utils.arr_info(plane_copies)
 
 def testing__aggregate_masks__generate_aggregate_masks():
     # Tests aggregate_masks.generate_aggregate_masks()
@@ -185,7 +190,8 @@ def testing__aggregate_masks__generate_aggregate_masks():
     aggregate_masks_list, new_names = generate_aggregate_masks(inferred_masks_list)
 
     # Check by eye
-    print(aggregate_masks_list[0])
+    from . import utils
+    utils.arr_info(aggregate_masks_list[0])
     print(new_names)
 
 def testing__aggregate_masks__make_movies_aggregate_masks():
