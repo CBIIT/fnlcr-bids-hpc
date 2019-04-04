@@ -8,7 +8,8 @@ def define_data():
     #models = ['08-hpset_21d','09-hpset_22']
     models = ['08-hpset_21d']
     inference_directions = ['x','y','z']
-    data_dir = '/home/weismanal/notebook/2019-02-13'
+    #data_dir = '/home/weismanal/notebook/2019-02-13'
+    data_dir = '/Users/weismanal/notebook/2019-04-03/testing_three_modules/data'
 
     return(roi_list, data_dir, models, inference_directions)
 
