@@ -102,6 +102,16 @@ def count(arr,twoD_stack_dim=-1):
         dims.remove(twoD_stack_dim)
         return(np.sum(arr,axis=tuple(dims)))
 
+# Define a function to create paths in the working directory
+def create_dir(path):
+    import os
+    try:  
+        os.mkdir(path)
+    except OSError:  
+        print ("Creation of the directory %s failed" % path)
+    else:  
+        print ("Successfully created the directory %s " % path)
+
 def get_colored_str(x):
     # Get HTML string that colors x according to its value so the table is colored
     col = 'black'
@@ -204,6 +214,29 @@ def quick_overlay_output(images, masks, overlay_tif_path):
     rgba1 = arr2rgba(images,A=255,shade_color=[1,1,1],makeBGTransp=False)
     rgba2 = arr2rgba(masks,A=round(0.25*255),shade_color=[1,0,0],makeBGTransp=True)
     io.imsave(overlay_tif_path,overlay_images(rgba1, rgba2))
+
+def randomize_labels(labels):
+    import random
+    import numpy as np
+    random.seed(1)
+    ind_labels = np.nonzero(labels!=0) # goes into labels; get the indices of labels that aren't background (=ind above)
+    labels_nonzero = labels[ind_labels] # get the foreground labels
+    labels2 = np.copy(labels) # duplicate the original labels
+    y = np.unique(labels_nonzero) # same as above
+    nx = y.size + 1 # same as above
+    z = y + 10*nx # same as above
+    random.shuffle(z) # shuffle the shifted unique labels (same as above)    
+    for i in np.arange(0,nx-1): # for indices of the unique labels excluding 0...
+        ilabel = y[i]
+        iz = z[i]
+        ind_labels_nonzero = np.nonzero(labels_nonzero==ilabel) # goes into labels_nonzero and ind_labels[X]; determine where the foreground labels equal the current unique foreground label
+        ind0 = ind_labels[0][ind_labels_nonzero] # get the "x" indices of labels that are the current foreground value
+        ind1 = ind_labels[1][ind_labels_nonzero] # get the "y" indices of labels that are the current foreground value
+        ind2 = ind_labels[2][ind_labels_nonzero] # get the "z" indices of labels that are the current foreground value
+        labels2[ind0,ind1,ind2] = iz
+        #print(labels2[ind0,ind1,ind2]) # print the shifted and randomized foreground values that are the current unshifted, unrandomized foreground value
+    labels2[ind_labels] = labels2[ind_labels]  - 10*nx    
+    return(labels2)
 
 def stack_and_color_images(images, masks=None):
     # images can be (H,W), (H,W,3), (N,H,W), or (N,H,W,3)

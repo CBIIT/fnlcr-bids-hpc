@@ -1,8 +1,8 @@
-# These are "compound" functions used in the post-inference workflow. Simpler functions should be placed in the utils module.
+# These are the basic, "compound" functions used in the post-inference workflow.  Simpler functions should be placed in the utils module.  The aggregate_masks module should be subsequently used to convert multiple inferences into a single set of masks.
 
 def load_inferred_masks(roi, unpadded_shape, models, inference_directions, dir='.', do_output=True):
     # Load and process the masks inferred by every model in every inference direction
-    # This is tested in the load_data() function of the testing module
+    # This is tested in its own function of the testing module
 
     # Raw images correspond to what we're defining below as the (z,x,y) (stack, rows?, cols?) directions
     # iinfdir linearly (0,1,2) refers to the order of the input inference_directions, e.g., ['x','y','z'] or ['z']
@@ -166,7 +166,7 @@ def output_metrics(metrics_3d_list, roi_list, models, new_names=None):
     html_file.close()
     text_file.close()
 
-def make_movies(roi_list, images_list, inferred_masks_list, models, nframes=40, known_masks_list=None, metrics_2d_list=None, metrics_3d_list=None, framerate=2, delete_frames=True, ffmpeg_preload_string='module load FFmpeg; '):
+def make_movies_individual_masks(roi_list, images_list, inferred_masks_list, models, nframes=40, known_masks_list=None, metrics_2d_list=None, metrics_3d_list=None, framerate=2, delete_frames=True, ffmpeg_preload_string='module load FFmpeg; '):
     # This is tested in its own function of the testing module
 
     # Import relevant modules

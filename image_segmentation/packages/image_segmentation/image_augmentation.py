@@ -1,3 +1,4 @@
+# This module implements the imgaug package with reasonable, working-out-of-the-box settings as a template for further usage.
 # Note: This requires the imgaug package, which can be acquired on GitHub at https://github.com/aleju/imgaug
 
 # Augmentation parameters structure; this is a nice set of settings that worked well previously
@@ -56,8 +57,8 @@ def example_individual_seqs_and_outnames(aug_params):
         [iaa.Sequential(iaa.ContrastNormalization((aug_params.contrast_normalization_factors[1],aug_params.contrast_normalization_factors[1]))), 'contrast_norm_high'],
         [iaa.Sequential(iaa.Affine(rotate=aug_params.rotation_degrees,scale=aug_params.scale_factors)), 'affine']])
 
-
 def augment_images(images, masks=None, do_composite=True, imgaug_repo='/Users/weismanal/checkouts/imgaug', output_dir=None, aug_params=None, composite_sequence=None, num_aug=1, individual_seqs_and_outnames=None):
+    # Tested in its own function in the testing module
 
     # Since imgaug is a GitHub repo, we need to point to where the clone is so we can import the library
     import sys
