@@ -6,7 +6,9 @@
 
 ---
 
-# Use case #1
+# How to create a central Git repository
+
+## Use case #1
 
 You want to create a new, empty repository in order to track your work.
 
@@ -41,7 +43,7 @@ Use `[myusername@biowulf.nih.gov:]` in the `clone` command if the repository you
 
 Now changes can be pushed/pulled to/from the new repository.
 
-# Use case #2
+## Use case #2
 
 You have an unversioned tree of code and want to make a repository out of it in order to track future changes, whether by you only (Section 2a) or by both you and others (Section 2b).
 
