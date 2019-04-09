@@ -23,6 +23,7 @@ function get_curr_toc() {
     id1=$3
     basepath=$4
     id2=0
+    echo "## Site Directory"
     for dir in $dirlist; do
         readme="$dir/README.md"
         dirname=$(grep "^#\ " "$readme" | head -n 1 | awk -v FS="# " '{print $2}')
