@@ -28,7 +28,7 @@ function get_curr_toc() {
         dirname=$(grep "^#\ " "$readme" | head -n 1 | awk -v FS="# " '{print $2}')
         ntimes=$(echo "$dir" | awk '{print(gsub("/","/"))}')
         ntimes=$((ntimes-nroot))
-        if [ "$id1" -eq "$id2" ]; then
+        if [ "$id1" == "$id2" ]; then
             str="**${dirname}**"
         else
             link=https://cbiit.github.io$(echo "$dir" | awk -v FS="$basepath" '{print $2}')
@@ -63,15 +63,16 @@ for dir0 in $dirlist; do
     readme0="$dir0/README.md"
 
     # Rename the current README file
-    mv "$readme0" "$dir0/README-tmp.md"
+    cp "$readme0" "$dir0/README-tmp.md"
 
     # Output the current TOC into a new README file
-    get_curr_toc "$dirlist" "$nroot" "$id1" "$basepath" > "$readme0"
+    get_curr_toc "$dirlist" "$nroot" "$id1" "$basepath" > tmp.txt
 
     # Append the original contents of the README file to the new README file
-    awk -v doprint=0 '{if(!doprint){if($0~"^#\ ")doprint=1}; if(doprint)print}' README-tmp.md >> "$readme0"
+    awk -v doprint=0 '{if(!doprint){if($0~"^# ")doprint=1}; if(doprint)print}' "$dir0/README-tmp.md" >> tmp.txt
 
     # Remove the old README
+    mv -f tmp.txt "$readme0"
     rm -f "$dir0/README-tmp.md"
 
     # Get the ID of the next directory
