@@ -34,7 +34,7 @@ function get_curr_toc() {
             link=https://cbiit.github.io$(echo "$dir" | awk -v FS="$basepath" '{print $2}')
             str="[$dirname]($link)"
         fi
-        echo "$(pad_str "  " $ntimes)* $str  "
+        echo "$(pad_str "  " $ntimes)* $str"
         id2=$((id2+1))
     done
     echo -e "\n\n---\n"
