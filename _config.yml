@@ -27,27 +27,27 @@ description: Documentation for the High Performance Computing program in the BID
 
 # List of links in the navigation bar
 navbar-links:
-  Site Directory:
-    documentation:
-      - How to create a central Git repository: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/how_to_create_a_central_git_repo"
-      - How to make your code CANDLE-compliant: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/how_to_make_your_code_candle_compliant"
-      - How to run CANDLE on Biowulf: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/how_to_run_candle_on_biowulf"
-  About Me: "aboutme"
-  Resources:
-    - Beautiful Jekyll: "http://deanattali.com/beautiful-jekyll/"
-    - Learn markdown: "http://www.markdowntutorial.com/"
-    - GitHub Pages: "https://pages.github.com/"
-  Author's home: "http://deanattali.com"
-
-#  * [How to use the image_segmentation module](https://cbiit.github.io/fnlcr-bids-hpc/image_segmentation)
-#    * [packages](https://cbiit.github.io/fnlcr-bids-hpc/image_segmentation/packages)
-#      * [image_segmentation](https://cbiit.github.io/fnlcr-bids-hpc/image_segmentation/packages/image_segmentation)
-#    * [sample_data](https://cbiit.github.io/fnlcr-bids-hpc/image_segmentation/sample_data)
-#  * [modules](https://cbiit.github.io/fnlcr-bids-hpc/modules)
-#    * [candle](https://cbiit.github.io/fnlcr-bids-hpc/modules/candle)
-#  * [native_candle_build_on_biowulf](https://cbiit.github.io/fnlcr-bids-hpc/native_candle_build_on_biowulf)
-#    * [build_on_2019-04-04](https://cbiit.github.io/fnlcr-bids-hpc/native_candle_build_on_biowulf/build_on_2019-04-04)
-#  * [scripts](https://cbiit.github.io/fnlcr-bids-hpc/scripts)
+  #About Me: "aboutme"
+  #Resources:
+  #  - Beautiful Jekyll: "http://deanattali.com/beautiful-jekyll/"
+  #  - Learn markdown: "http://www.markdowntutorial.com/"
+  #  - GitHub Pages: "https://pages.github.com/"
+  #Author's home: "http://deanattali.com"
+  CANDLE docs:
+    - How to run CANDLE on Biowulf: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/how_to_run_candle_on_biowulf"
+    - How to make your code CANDLE-compliant: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/how_to_make_your_code_candle_compliant"
+  Other docs:
+    - How to create a central Git repository: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/how_to_create_a_central_git_repo"
+  Image segmentation module:
+    - How to use the image_segmentation module: "https://cbiit.github.io/fnlcr-bids-hpc/image_segmentation"
+  Scripts: "https://cbiit.github.io/fnlcr-bids-hpc/scripts"
+  GitHub repo: "https://github.com/CBIIT/fnlcr-bids-hpc"
+  Links:
+    - CANDLE templates: "https://github.com/ECP-CANDLE/Supervisor/tree/develop/templates"
+    - CANDLE docs: "https://ecp-candle.github.io/Candle"
+    - NIH.AI: "https://nciphub.org/groups/nihai"
+    - Biowulf: "https://hpc.nih.gov"
+  Contact: "mailto:andrew.weisman@nih.gov"
 
 # Image to show in the navigation bar - image must be a square (width = height)
 # Remove this parameter if you don't want an image in the navbar
@@ -83,7 +83,7 @@ footer-link-col: "#404040"
 # Change all these values or delete the ones you don't want.
 # Important: you must keep the "name" parameter, everything else you can remove
 author:
-  name: Some Person
+  name: Andrew Weisman
 
 # Select your active Social Network Links.
 # Uncomment the links you want to show in the footer and add your information to each link.
@@ -91,10 +91,8 @@ author:
 # If you want to add a new link that isn't here, you'll need to also edit the file _data/SocialNetworks.yml
 social-network-links:
   rss: true
-  email: "someone@example.com"
-  facebook: daattali
-  github: daattali
-  twitter: daattali
+  email: "andrew.weisman@nih.gov"
+  github: CBIIT/fnlcr-bids-hpc
 #  reddit: yourname
 #  google-plus: +DeanAttali
 #  linkedin: daattali
@@ -118,7 +116,8 @@ share-links-active:
 
 # How to display the link to the website in the footer
 # Remove this if you don't want a link in the footer
-url-pretty: "MyWebsite.com"  # eg. "deanattali.com/beautiful-jekyll"
+#url-pretty: "MyWebsite.com"  # eg. "deanattali.com/beautiful-jekyll"
+url-pretty: "https://cbiit.github.io/fnlcr-bids-hpc"  # eg. "deanattali.com/beautiful-jekyll"
 
 # --- Web Statistics Section --- #
 
