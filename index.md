@@ -1,5 +1,4 @@
 ---
-title: Home
 bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
 gh-repo: CBIIT/fnlcr-bids-hpc
 gh-badge: star
