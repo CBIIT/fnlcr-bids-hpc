@@ -1,5 +1,7 @@
-# How to run CANDLE on Biowulf
-
+---
+bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
+title: How to run CANDLE on Biowulf
+---
 ## Step (1): Set up the environment
 
 For example, assuming your working directory is `/data/smithja/candle-test`, run this on the Biowulf command line:

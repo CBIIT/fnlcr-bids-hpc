@@ -1,5 +1,7 @@
-# How to use the image_segmentation module
-
+---
+bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
+title: How to use the image_segmentation module
+---
 Note: At the moment, only the image_augmentation.py function is well-tested; the rest are coming soon!
 
 ## How to use the image_augmentation function

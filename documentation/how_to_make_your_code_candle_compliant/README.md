@@ -1,5 +1,7 @@
-# How to make your code CANDLE-compliant
-
+---
+bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
+title: How to make your code CANDLE-compliant
+---
 The assumption is that your code is in Python and runs as-is on Biowulf.  For help with this, [contact us](mailto:andrew.weisman@nih.gov).
 
 The backend doesn't matter; we have tested both Keras and PyTorch.  When in doubt, use Keras.

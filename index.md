@@ -1,7 +1,5 @@
 ---
 bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
-gh-repo: CBIIT/fnlcr-bids-hpc
-gh-badge: star
 ---
 Welcome to HPC Docs, documentation for the High Performance Computing program in the BIDS directorate of the Frederick National Laboratory for Cancer Research.
 

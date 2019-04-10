@@ -1,5 +1,7 @@
-# How to create a central Git repository
-
+---
+bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
+title: How to create a central Git repository
+---
 ## Use case #1
 
 You want to create a new, empty repository in order to track your work.
