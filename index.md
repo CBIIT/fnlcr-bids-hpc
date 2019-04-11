@@ -1,7 +1,7 @@
 ---
 bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
 ---
-WWWWelcome to HPC Docs, documentation for the High Performance Computing program in the BIDS directorate of the Frederick National Laboratory for Cancer Research.
+Welcome to HPC Docs, documentation for the High Performance Computing program in the BIDS directorate of the Frederick National Laboratory for Cancer Research.
 
 Please click on the links at the top of the page to navigate this site.
 
