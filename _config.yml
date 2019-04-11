@@ -11,14 +11,14 @@
 #url: "http://username.github.io/projectname"
 #baseurl: "/projectname"
 url: "https://cbiit.github.io/fnlcr-bids-hpc"
-#baseurl: "/fnlcr-bids-hpc"
-baseurl: "/fnlcr-bids-hpc/jekyll/beautiful-jekyll"
+baseurl: "/fnlcr-bids-hpc"
+#baseurl: "/fnlcr-bids-hpc/jekyll/beautiful-jekyll"
 
 # Of course don't forget to change the username and projectname to YOUR username and project
 
 # Name of website
 #title: My website
-title: HPC Docs testttttt
+title: HPC Docs
 
 # Short description of your site
 #description: A virtual proof that name is awesome!
