@@ -2,9 +2,11 @@
 bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
 title: How to make your code CANDLE-compliant
 ---
-The assumption is that your code is in Python and runs as-is on Biowulf.  For help with this, [contact us](mailto:andrew.weisman@nih.gov).
+This page will show you how to make your Python script CANDLE-compliant.  See the note on [this page](XXXX) for more information on language support in CANDLE.
 
-The backend doesn't matter; we have tested both Keras and PyTorch.  When in doubt, use Keras.
+We assume that your code already runs successfully as a standalone script on Biowulf.  For help with this, reach out to us at the contact information at the bottom of this page.
+
+For more information on CANDLE, please click [here](XXXX).
 
 ## Step (1): Place your *entire* Python script in a `run` function
 
@@ -164,3 +166,4 @@ In fact, this exact file is present in our CANDLE templates at `/data/BIDS-HPC/p
 * Sample CANDLE-compliant scripts can be found [here](https://github.com/ECP-CANDLE/Supervisor/tree/develop/templates/models).
 * More details on writing CANDLE-compliant code can be found [here](https://ecp-candle.github.io/Candle/html/tutorials/writing_candle_code.html).
 * You can check GPU utilization on a compute node using `watch nvidia-smi` (use Ctrl+C to exit out of the `watch` command).
+* Feel free to email [Andrew Weisman](mailto:andrew.weisman@nih.gov) with any questions.
