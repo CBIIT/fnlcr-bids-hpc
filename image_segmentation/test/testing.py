@@ -54,46 +54,46 @@ def testing__image_augmentation__augment_images():
     curr_dir = os.path.dirname(os.path.realpath(__file__))
 
     # Input image definitions
-    lady_single_rgb = io.imread(curr_dir + '/sample_data/lady_rgb.jpg') # (H,W,3)
-    lady_stack_rgb = np.load(curr_dir + '/sample_data/lady_images_rgb_original_15.npy') # (N,H,W,3)
+    lady_single_rgb = io.imread(curr_dir + '/../sample_data/lady_rgb.jpg') # (H,W,3)
+    lady_stack_rgb = np.load(curr_dir + '/../sample_data/lady_images_rgb_original_15.npy') # (N,H,W,3)
     lady_single_gray = lady_single_rgb[:,:,0] # (H,W)
     lady_stack_gray = lady_stack_rgb[:,:,:,0] # (N,H,W)
-    lady_stack_masks = np.load(curr_dir + '/sample_data/lady_masks_original_15.npy') # (N,H,W)
+    lady_stack_masks = np.load(curr_dir + '/../sample_data/lady_masks_original_15.npy') # (N,H,W)
 
     # Augment images only
     mydir = 'augmented_images_only'
     utils.create_dir(mydir)
-    # image_aug = augment_images(lady_single_gray, num_aug=50, imgaug_repo=imgaug_path)
-    # image_aug = augment_images(lady_single_rgb, imgaug_repo=imgaug_path)
-    # image_aug = augment_images(lady_single_rgb, num_aug=25, output_dir=mydir, imgaug_repo=imgaug_path)
-    # image_aug = augment_images(lady_single_rgb, num_aug=50, imgaug_repo=imgaug_path)
-    # image_aug = augment_images(lady_single_rgb, output_dir=mydir, imgaug_repo=imgaug_path)
-    # image_aug = augment_images(lady_stack_gray, imgaug_repo=imgaug_path)
-    # image_aug = augment_images(lady_stack_rgb, imgaug_repo=imgaug_path)
-    image_aug = augment_images(lady_stack_rgb, output_dir=mydir, imgaug_repo=imgaug_path)
+    # image_aug = augment_images(lady_single_gray, num_aug=50)
+    # image_aug = augment_images(lady_single_rgb)
+    # image_aug = augment_images(lady_single_rgb, num_aug=25, output_dir=mydir)
+    # image_aug = augment_images(lady_single_rgb, num_aug=50)
+    # image_aug = augment_images(lady_single_rgb, output_dir=mydir)
+    # image_aug = augment_images(lady_stack_gray)
+    # image_aug = augment_images(lady_stack_rgb)
+    image_aug = augment_images(lady_stack_rgb, output_dir=mydir)
     print(image_aug.shape)
 
     # Augment both images and masks
     mydir = 'augmented_images_and_masks'
     utils.create_dir(mydir)
-    # image_aug, mask_aug = augment_images(lady_stack_gray, masks=lady_stack_masks, imgaug_repo=imgaug_path)
-    # image_aug, mask_aug = augment_images(lady_stack_gray, masks=lady_stack_masks, output_dir=mydir, imgaug_repo=imgaug_path)
-    # image_aug, mask_aug = augment_images(lady_stack_gray, num_aug=3, masks=lady_stack_masks, imgaug_repo=imgaug_path)
-    # image_aug, mask_aug = augment_images(lady_stack_rgb, masks=lady_stack_masks, imgaug_repo=imgaug_path)
-    image_aug, mask_aug = augment_images(lady_stack_rgb, masks=lady_stack_masks, output_dir=mydir, imgaug_repo=imgaug_path)
-    # image_aug, mask_aug = augment_images(lady_stack_rgb, num_aug=3, masks=lady_stack_masks, imgaug_repo=imgaug_path)
+    # image_aug, mask_aug = augment_images(lady_stack_gray, masks=lady_stack_masks)
+    # image_aug, mask_aug = augment_images(lady_stack_gray, masks=lady_stack_masks, output_dir=mydir)
+    # image_aug, mask_aug = augment_images(lady_stack_gray, num_aug=3, masks=lady_stack_masks)
+    # image_aug, mask_aug = augment_images(lady_stack_rgb, masks=lady_stack_masks)
+    image_aug, mask_aug = augment_images(lady_stack_rgb, masks=lady_stack_masks, output_dir=mydir)
+    # image_aug, mask_aug = augment_images(lady_stack_rgb, num_aug=3, masks=lady_stack_masks)
     print(image_aug.shape, mask_aug.shape)
 
     # View individual image augmentations
     mydir = 'individual_augmentations'
     utils.create_dir(mydir)
-    # image_aug_list = augment_images(lady_single_rgb, do_composite=False, imgaug_repo=imgaug_path)
-    # image_aug_list = augment_images(lady_single_rgb, do_composite=False, output_dir=mydir, imgaug_repo=imgaug_path)
-    # image_aug_list = augment_images(lady_single_rgb, num_aug=5, do_composite=False, output_dir=mydir, imgaug_repo=imgaug_path)
-    # image_aug_list = augment_images(lady_stack_gray, do_composite=False, imgaug_repo=imgaug_path)
-    # image_aug_list = augment_images(lady_stack_rgb, do_composite=False, imgaug_repo=imgaug_path)
-    # image_aug_list = augment_images(lady_stack_rgb, do_composite=False, output_dir=mydir, imgaug_repo=imgaug_path)
-    image_aug_list = augment_images(lady_stack_rgb, num_aug=2, do_composite=False, output_dir=mydir, imgaug_repo=imgaug_path)
+    # image_aug_list = augment_images(lady_single_rgb, do_composite=False)
+    # image_aug_list = augment_images(lady_single_rgb, do_composite=False, output_dir=mydir)
+    # image_aug_list = augment_images(lady_single_rgb, num_aug=5, do_composite=False, output_dir=mydir)
+    # image_aug_list = augment_images(lady_stack_gray, do_composite=False)
+    # image_aug_list = augment_images(lady_stack_rgb, do_composite=False)
+    # image_aug_list = augment_images(lady_stack_rgb, do_composite=False, output_dir=mydir)
+    image_aug_list = augment_images(lady_stack_rgb, num_aug=2, do_composite=False, output_dir=mydir)
     print(image_aug_list[0].shape)
 
 def testing__post_inference__load_inferred_masks():

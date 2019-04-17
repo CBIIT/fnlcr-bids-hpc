@@ -114,6 +114,7 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
 
     # Temporarily hardcoded until modules is implemented
     imgaug_repo = '/data/BIDS-HPC/public/software/checkouts/imgaug'
+    #imgaug_repo = '/Users/weismanal/checkouts/imgaug'
 
     # Since imgaug is a GitHub repo, we need to point to where the clone is so we can import the library
     import sys
