@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Documentation for the the fnlcr-bids-hpc GitHub repository &#8212; FNLCR-BIDS-HPC  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to FNLCR-BIDS-HPC’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-image_segmentation">
+<span id="documentation-for-the-the-fnlcr-bids-hpc-github-repository"></span><h1>Documentation for the the fnlcr-bids-hpc GitHub repository<a class="headerlink" href="#module-image_segmentation" title="Permalink to this headline">¶</a></h1>
+<p>Documentation for the image_segmentation module.</p>
+<span class="target" id="module-image_segmentation.image_augmentation"></span><span class="target" id="module-image_augmentation"></span><dl class="function">
+<dt id="image_segmentation.image_augmentation.augment_images">
+<code class="descclassname">image_segmentation.image_augmentation.</code><code class="descname">augment_images</code><span class="sig-paren">(</span><em>images</em>, <em>masks=None</em>, <em>num_aug=1</em>, <em>do_composite=True</em>, <em>output_dir=None</em>, <em>composite_sequence=None</em>, <em>individual_seqs_and_outnames=None</em>, <em>aug_params=None</em><span class="sig-paren">)</span><a class="headerlink" href="#image_segmentation.image_augmentation.augment_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Augment images and/or masks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images</strong> – Images to augment;
+NumPy array of shape (H,W), (H,W,3), (N,H,W), or (N,H,W,3);
+values can be in range [0,1], [0,2^8-1], or [0,2^16-1]</p></li>
+<li><p><strong>masks</strong> – (Optional) Masks to correspondingly augment;
+NumPy array of shape (H,W) or (N,H,W);
+values are 0 and positive integers</p></li>
+<li><p><strong>num_aug</strong> (<em>int.</em>) – (Optional) Number of augmentations to perform;
+number of output images will be N * num_aug</p></li>
+<li><p><strong>do_composite</strong> (<em>bool.</em>) – (Optional) Whether to do composite augmentations (multiple augmentations at once) or individual augmentations (for observing the effect of each augmentation);
+only has an effect if either (1) both composite_sequence and individual_seqs_and_outnames are None or (2) both composite_sequence and individual_seqs_and_outnames are set</p></li>
+<li><p><strong>output_dir</strong> (<em>str.</em>) – (Optional) If not set to None, location where .tif images should be saved for observation purposes;
+if set to None, no saving will be done</p></li>
+<li><p><strong>composite_sequence</strong> (<em>func.</em>) – (Optional) Function specifying the sequence of augmentations to perform all at once;
+if set to None, the default example_composite_sequence (below) is used;
+to customize the composite sequence, create a function taking example_composite_sequence as an example</p></li>
+<li><p><strong>individual_seqs_and_outnames</strong> (<em>func.</em>) – (Optional) Function specifying the individual augmentations to perform;
+if set to None, the default example_individual_seqs_and_outnames (below) is used;
+to customize the individual augmentations, create a function taking example_individual_seqs_and_outnames as an example</p></li>
+<li><p><strong>aug_params</strong> (<em>cls.</em>) – (Optional) Class specifying the augmentation parameters to apply to either composite or individual augmentations;
+if set to None, the default example_augmentation_parameters (below) is used;
+to customize the augmentation parameters, create a class taking example_augmentation_parameters as an example</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>If do_composite=True: augmented images ((N,H,W,C)), and, if masks were input, augmented masks ((N,H,W)); these are both NumPy arrays of dtype=’uint8’</p></li>
+<li><p>If do_composite=False: list of augmented images ((N,H,W,C)), one for each individual augmentation; these are all NumPy arrays of dtype=’uint8’</p></li>
+</ul>
+<p>As mentioned above, note that do_composite can be set by setting one (and only one) of composite_sequence and individual_seqs_and_outnames to functions (i.e., not None)</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="image_segmentation.image_augmentation.example_augmentation_parameters">
+<em class="property">class </em><code class="descclassname">image_segmentation.image_augmentation.</code><code class="descname">example_augmentation_parameters</code><a class="headerlink" href="#image_segmentation.image_augmentation.example_augmentation_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>This provides a nice set of default augmentation parameters.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="image_segmentation.image_augmentation.example_composite_sequence">
+<code class="descclassname">image_segmentation.image_augmentation.</code><code class="descname">example_composite_sequence</code><span class="sig-paren">(</span><em>aug_params</em><span class="sig-paren">)</span><a class="headerlink" href="#image_segmentation.image_augmentation.example_composite_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>This provides a nice default composite sequence.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="image_segmentation.image_augmentation.example_individual_seqs_and_outnames">
+<code class="descclassname">image_segmentation.image_augmentation.</code><code class="descname">example_individual_seqs_and_outnames</code><span class="sig-paren">(</span><em>aug_params</em><span class="sig-paren">)</span><a class="headerlink" href="#image_segmentation.image_augmentation.example_individual_seqs_and_outnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>This provides a nice set of default individual augmentations.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">FNLCR-BIDS-HPC</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation for the the fnlcr-bids-hpc GitHub repository</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to FNLCR-BIDS-HPC’s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, BIDS-HPC.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/code.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

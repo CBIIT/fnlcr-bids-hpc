@@ -2,7 +2,7 @@
 import sys
 #sys.path.append('/home/weismanal/checkouts/fnlcr-bids-hpc') # only on Biowulf
 #sys.path.append('/Users/weismanal/checkouts/fnlcr-bids-hpc') # only on laptop
-from image_segmentation import testing
+from image_segmentation.test import testing
 
 # Test the helper functions in the testing module
 #print(testing.define_data())

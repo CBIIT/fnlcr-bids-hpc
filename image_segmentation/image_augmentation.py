@@ -1,8 +1,17 @@
+"""
+.. module:: image_augmentation
+   :platform: Linux
+   :synopsis: This is the module used for augmenting images, the main function of which is augment_images().
+
+.. moduleauthor:: Andrew Weisman <andrew.weisman@nih.gov>
+"""
+
 # This module implements the imgaug package with reasonable, working-out-of-the-box settings as a template for further usage.
 # Note: This requires the imgaug package, which can be acquired on GitHub at https://github.com/aleju/imgaug
 
 # Augmentation parameters structure; this is a nice set of settings that worked well previously
 class example_augmentation_parameters():
+    """This provides a nice set of default augmentation parameters."""
     def __init__(self):
         self.flip_factor = 0.5
         self.add_vals = (-30,30)
@@ -17,6 +26,7 @@ class example_augmentation_parameters():
 
 # Composite sequence of augmentations; this is a nice set that worked well previously
 def example_composite_sequence(aug_params):
+    """This provides a nice default composite sequence."""
     from imgaug import augmenters as iaa
     return(iaa.Sequential([
         iaa.Flipud(aug_params.flip_factor),
@@ -41,6 +51,7 @@ def example_composite_sequence(aug_params):
 
 # Sample set of individual augmentations in order to see what they do individually
 def example_individual_seqs_and_outnames(aug_params):
+    """This provides a nice set of default individual augmentations."""
     from imgaug import augmenters as iaa
     return([
         [iaa.Sequential(iaa.Flipud(1)), 'flipud'],
@@ -57,8 +68,53 @@ def example_individual_seqs_and_outnames(aug_params):
         [iaa.Sequential(iaa.ContrastNormalization((aug_params.contrast_normalization_factors[1],aug_params.contrast_normalization_factors[1]))), 'contrast_norm_high'],
         [iaa.Sequential(iaa.Affine(rotate=aug_params.rotation_degrees,scale=aug_params.scale_factors)), 'affine']])
 
-def augment_images(images, masks=None, do_composite=True, imgaug_repo='/Users/weismanal/checkouts/imgaug', output_dir=None, aug_params=None, composite_sequence=None, num_aug=1, individual_seqs_and_outnames=None):
+def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=None, composite_sequence=None, individual_seqs_and_outnames=None, aug_params=None):
+    """Augment images and/or masks.
+
+    :param images: Images to augment;
+        NumPy array of shape (H,W), (H,W,3), (N,H,W), or (N,H,W,3);
+        values can be in range [0,1], [0,2^8-1], or [0,2^16-1]
+    :param masks:
+        (Optional) Masks to correspondingly augment;
+        NumPy array of shape (H,W) or (N,H,W);
+        values are 0 and positive integers
+    :param num_aug:
+        (Optional) Number of augmentations to perform;
+        number of output images will be N * num_aug
+    :type num_aug: int.
+    :param do_composite:
+        (Optional) Whether to do composite augmentations (multiple augmentations at once) or individual augmentations (for observing the effect of each augmentation);
+        only has an effect if either (1) both composite_sequence and individual_seqs_and_outnames are None or (2) both composite_sequence and individual_seqs_and_outnames are set
+    :type do_composite: bool.
+    :param output_dir:
+        (Optional) If not set to None, location where .tif images should be saved for observation purposes;
+        if set to None, no saving will be done
+    :type output_dir: str.
+    :param composite_sequence:
+        (Optional) Function specifying the sequence of augmentations to perform all at once;
+        if set to None, the default example_composite_sequence (below) is used;
+        to customize the composite sequence, create a function taking example_composite_sequence as an example
+    :type composite_sequence: func.
+    :param individual_seqs_and_outnames:
+        (Optional) Function specifying the individual augmentations to perform;
+        if set to None, the default example_individual_seqs_and_outnames (below) is used;
+        to customize the individual augmentations, create a function taking example_individual_seqs_and_outnames as an example
+    :type individual_seqs_and_outnames: func.
+    :param aug_params:
+        (Optional) Class specifying the augmentation parameters to apply to either composite or individual augmentations;
+        if set to None, the default example_augmentation_parameters (below) is used;
+        to customize the augmentation parameters, create a class taking example_augmentation_parameters as an example
+    :type aug_params: cls.
+    :returns:
+        * If do_composite=True: augmented images ((N,H,W,C)), and, if masks were input, augmented masks ((N,H,W)); these are both NumPy arrays of dtype='uint8'\n
+        * If do_composite=False: list of augmented images ((N,H,W,C)), one for each individual augmentation; these are all NumPy arrays of dtype='uint8'\n
+        As mentioned above, note that do_composite can be set by setting one (and only one) of composite_sequence and individual_seqs_and_outnames to functions (i.e., not None)
+    """
     # Tested in its own function in the testing module
+
+    # Temporarily hardcoded until modules is implemented
+    imgaug_repo = '/data/BIDS-HPC/public/software/checkouts/imgaug'
+    #imgaug_repo = '/Users/weismanal/checkouts/imgaug'
 
     # Since imgaug is a GitHub repo, we need to point to where the clone is so we can import the library
     import sys
@@ -96,6 +152,12 @@ def augment_images(images, masks=None, do_composite=True, imgaug_repo='/Users/we
         io.imsave(output_dir+'/'+'input.tif',images)
         if masks is not None:
             utils.quick_overlay_output(images, masks, output_dir+'/'+'input-overlay.tif')
+
+    # Set do_composite in the non-ambiguous cases
+    if (composite_sequence is None) and (individual_seqs_and_outnames is not None):
+        do_composite = False
+    if (composite_sequence is not None) and (individual_seqs_and_outnames is None):
+        do_composite = True
 
     # If we want to do each augmentation individually in order to manually inspect exactly what each augmentation does...
     if not do_composite:
