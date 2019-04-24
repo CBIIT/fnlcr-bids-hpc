@@ -2,39 +2,7 @@
 bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
 title: How to modify the CANDLE templates
 ---
-The CANDLE templates [run_without_candle.sh](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/run_without_candle.sh) and [submit_candle_job.sh](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/submit_candle_job.sh) run as-is as examples on the MNIST dataset.  This page will show you how to modify these template scripts for your own use.
-
-## How to modify `run_without_candle.sh` for your own use
-
-As explained [here](https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_make_your_code_candle_compliant), the `run_without_candle.sh` [template](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/run_without_candle.sh) is primarily used for testing whether you've successfully made your model CANDLE-compliant.  Here is the code:
-
-```bash
-#!/bin/bash
-
-#SBATCH --partition=gpu
-#SBATCH --mem=20G
-#SBATCH --gres=gpu:k80:1
-#SBATCH --time=00:05:00
-#SBATCH --job-name=mnist_test_no_candle
-
-# Set up environment
-module load python/3.6 candle
-
-# Set the file that the Python script below will read in order to determine the model parameters
-export DEFAULT_PARAMS_FILE="$CANDLE/Supervisor/templates/model_params/mnist1.txt"
-
-# Run the model
-python $CANDLE/Supervisor/templates/models/mnist/mnist_mlp.py
-```
-
-Here are the lines where changes would most likely be made:
-
-* `#SBATCH --mem=20G`: Change `20G` to the largest amount of memory your model may require for a single job (i.e., for a single set of hyperparameters)
-* `#SBATCH --gres=gpu:k80:1`: Since we're only testing CANDLE-compliance, only lower-end GPUs, such as the `k20x` or the `k80`, are likely required
-* `#SBATCH --time=00:05:00`: Set this to however long you expect your job to run (`HH:MM:SS`)
-* `module load python/3.6 candle`: If your model requires additional modules or environment settings (think Conda environments or Bash variable settings), add them here
-* `export DEFAULT_PARAMS_FILE="$CANDLE/Supervisor/templates/model_params/mnist1.txt"`: Set the `$DEFAULT_PARAMS_FILE` variable to the location of your [default parameters file](https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_make_your_code_candle_compliant), e.g., `export DEFAULT_PARAMS_FILE="/path/to/params/file.txt"`
-* `python $CANDLE/Supervisor/templates/models/mnist/mnist_mlp.py`: Set this to your CANDLE-compliant Python script, e.g., `python /path/to/candle/compliant/script.py`
+The CANDLE templates [submit_candle_job.sh](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/submit_candle_job.sh) and [run_without_candle.sh](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/run_without_candle.sh) run as-is as examples on the MNIST dataset.  This page will show you how to modify these template scripts for your own use.
 
 ## How to modify `submit_candle_job.sh` for your own use
 
@@ -90,9 +58,43 @@ As indicated by the `...####...` lines, here are the variables where changes wou
 * Scheduler variables:
   * `PROCS`: Number of GPUs to use for the job (actually, PROCS-1 GPUs are used for UPF and PROCS-2 for mlrMBO)
   * `PPN`: GPU processes per node (generally set this to `1`)
-  * `WALLTIME`: How long you expect the entire hyperparameter optimization to take
+  * `WALLTIME`: How long you expect the entire hyperparameter optimization to take (`HH:MM:SS`)
   * `GPU_TYPE`: Type of GPU card to use; from worst to best on Biowulf: `k20x`, `k80`, `p100`, `v100`
-  * `MEM_PER_NODE`: Maximum amount of memory expected to be used for a single job
+  * `MEM_PER_NODE`: Maximum amount of memory expected to be used for a single job (i.e., for a single set of hyperparameters)
+
+Note that if your model requires additional modules or environment settings (think Conda environments or Bash variable settings), add them somewhere between the `...####...` lines.
+
+## How to modify `run_without_candle.sh` for your own use
+
+As explained [here](https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_make_your_code_candle_compliant), the `run_without_candle.sh` [template](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/run_without_candle.sh) is primarily used for testing whether you've successfully made your model CANDLE-compliant.  Here is the code:
+
+```bash
+#!/bin/bash
+
+#SBATCH --partition=gpu
+#SBATCH --mem=20G
+#SBATCH --gres=gpu:k80:1
+#SBATCH --time=00:05:00
+#SBATCH --job-name=mnist_test_no_candle
+
+# Set up environment
+module load python/3.6 candle
+
+# Set the file that the Python script below will read in order to determine the model parameters
+export DEFAULT_PARAMS_FILE="$CANDLE/Supervisor/templates/model_params/mnist1.txt"
+
+# Run the model
+python $CANDLE/Supervisor/templates/models/mnist/mnist_mlp.py
+```
+
+Here are the lines where changes would most likely be made:
+
+* `#SBATCH --mem=20G`: Change `20G` to the largest amount of memory your model may require for a single job
+* `#SBATCH --gres=gpu:k80:1`: Since we're only testing CANDLE-compliance, only lower-end GPUs, such as the `k20x` or the `k80`, are likely required
+* `#SBATCH --time=00:05:00`: Set this to however long you expect your job to run (`HH:MM:SS`)
+* `module load python/3.6 candle`: If your model requires additional modules or environment settings (think Conda environments or Bash variable settings), add them here
+* `export DEFAULT_PARAMS_FILE="$CANDLE/Supervisor/templates/model_params/mnist1.txt"`: Set the `$DEFAULT_PARAMS_FILE` variable to the location of your [default parameters file](https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_make_your_code_candle_compliant), e.g., `export DEFAULT_PARAMS_FILE="/path/to/params/file.txt"`
+* `python $CANDLE/Supervisor/templates/models/mnist/mnist_mlp.py`: Set this to your CANDLE-compliant Python script, e.g., `python /path/to/candle/compliant/script.py`
 
 ## Notes
 
