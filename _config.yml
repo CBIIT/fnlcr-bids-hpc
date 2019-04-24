@@ -41,8 +41,8 @@ navbar-links:
     - How to make your code CANDLE-compliant: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_make_your_code_candle_compliant"
   Other docs:
     - How to create a central Git repository: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/how_to_create_a_central_git_repo"
-  Image segmentation module:
-    - How to use the image_segmentation module: "https://cbiit.github.io/fnlcr-bids-hpc/packages/image_segmentation"
+#  Image segmentation module:
+#    - How to use the image_segmentation module: "https://cbiit.github.io/fnlcr-bids-hpc/packages/image_segmentation"
   Scripts: "https://cbiit.github.io/fnlcr-bids-hpc/scripts"
   Links:
     - CANDLE templates: "https://github.com/ECP-CANDLE/Supervisor/tree/develop/templates"
