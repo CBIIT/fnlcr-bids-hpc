@@ -45,7 +45,7 @@ navbar-links:
 #    - How to use the image_segmentation module: "https://cbiit.github.io/fnlcr-bids-hpc/packages/image_segmentation"
   Scripts: "https://cbiit.github.io/fnlcr-bids-hpc/scripts"
   Links:
-    - CANDLE templates: "https://github.com/ECP-CANDLE/Supervisor/tree/develop/templates"
+#    - CANDLE templates: "https://github.com/ECP-CANDLE/Supervisor/tree/fnlcr/templates"
     - CANDLE docs: "https://ecp-candle.github.io/Candle"
     - NIH.AI: "https://nciphub.org/groups/nihai"
     - Biowulf: "https://hpc.nih.gov"
