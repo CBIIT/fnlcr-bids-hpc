@@ -1,7 +1,7 @@
 # In Bash (only on Biowulf): module load python/3.6
 import sys
-#sys.path.append('/home/weismanal/checkouts/fnlcr-bids-hpc') # only on Biowulf
-#sys.path.append('/Users/weismanal/checkouts/fnlcr-bids-hpc') # only on laptop
+#sys.path.append('/home/weismanal/checkouts/fnlcr-bids-hpc/packages') # only on Biowulf
+#sys.path.append('/Users/weismanal/checkouts/fnlcr-bids-hpc/packages') # only on laptop
 from image_segmentation.test import testing
 
 # Test the helper functions in the testing module

@@ -22,7 +22,7 @@ The easiest way to start would be to [run an example HPO](XXXX) using CANDLE tha
 
 As Python is becoming the language of data science, CANDLE primarily supports code written in Python.  So if you are writing a deep learning model from scratch, or the one you already have is easy to convert to Python, we recommend you use Python.  It is a relatively intuitive scripting language and free online Python tutorials abound.
 
-That said, we do have burgeoning support for scripts written in other languages such as R.  If this functionality is important to you, [we are interested in hearing from you](mailto:andrew.weisman@nih.gov), and we are working on more complete documentation for using [language-agnostic scripts](XXXX) we have recently written to serve this purpose.
+That said, we do have burgeoning support for scripts written in other languages such as R.  If this functionality is important to you, [we are interested in hearing from you](mailto:andrew.weisman@nih.gov), and we are working on more complete documentation for using [language-agnostic scripts](https://github.com/ECP-CANDLE/Supervisor/tree/develop/templates/language_agnostic) we have recently written to serve this purpose.
 
 Please note that language of choice we are referring to is the one used to write the *main* script that would run without CANDLE.  For example, if you were to run your deep learning model using the command `python mymodel.py` the language you are using is Python, and if you ran your model using `R mymodel.R` the language you are using is R.  Main scripts such as these often call modules written in other languages.  For example, if your main script is written in Python and contains the code
 

@@ -2,11 +2,9 @@
 bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
 title: How to make your code CANDLE-compliant
 ---
-This page will show you how to make your Python script CANDLE-compliant.  See the note on [this page](XXXX) for more information on language support in CANDLE.
+This page will show you how to make your Python* script CANDLE-compliant.
 
 We assume that your code already runs successfully as a standalone script on Biowulf.  For help with this, reach out to us at the contact information at the bottom of this page.
-
-For more information on CANDLE, please click [here](XXXX).
 
 ## Step (1): Place your *entire* Python script in a `run` function
 
@@ -94,9 +92,9 @@ if __name__ == '__main__':
     main()
 ```
 
-## Step (4): Define the variables you would like to vary in a hyperparameter optimization
+## Step (4): Declare the variables you would like to vary in a hyperparameter optimization
 
-For example, if you define the variable `epochs` (which likely sets the number of epochs to run) in the second line of your code, do this:
+For example, if you define the variable `epochs` in the second line of your code, do this:
 
 **Before:**
 
@@ -122,7 +120,7 @@ While the dictionary "keys" (e.g., the argument to gParameters above) need not m
 
 ## Step (5): Create a default parameters file
 
-In order to initialize the parameters in any given run, you need a configuration file that sets their default values.  Here is an example such file (located at `/data/BIDS-HPC/public/candle/Supervisor/templates/model_params/mnist1.txt`):
+In order to initialize the parameters for any given run, you need a configuration file that sets their default values.  Here is an [example such file](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/model_params/mnist1.txt):
 
 ```
 [Global_Params]
@@ -132,13 +130,13 @@ activation='relu'
 optimizer='rmsprop'
 ```
 
-Note that this file is to be pointed to by the `DEFAULT_PARAMS_FILE` variable in the submission script `submit_candle_job.sh` described [here](https://cbiit.github.io/fnlcr-bids-hpc/documentation/how_to_run_candle_on_biowulf).
+Note that this file is to be pointed to by the `DEFAULT_PARAMS_FILE` variable in the submission script `submit_candle_job.sh` described [here](https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_modify_the_candle_templates).
 
 ## Testing your script
 
 You should be able to run your CANDLE-compliant script outside of the CANDLE "supervisor" by running your script manually on Biowulf.  This is an excellent test to show whether you've made your code properly CANDLE-compliant.
 
-For example, we would test that we've made our template MNIST example (called `mnist_mlp.py`) properly CANDLE-compliant by placing the following in a file called `run_without_candle.sh` and running `sbatch run_without_candle.sh` on Biowulf:
+For example, we would test that we've made our [template MNIST example](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/models/mnist/mnist_mlp.py) properly CANDLE-compliant by placing the following in a file called `run_without_candle.sh` and running `sbatch run_without_candle.sh` on Biowulf:
 
 ```bash
 #!/bin/bash
@@ -159,11 +157,13 @@ export DEFAULT_PARAMS_FILE="$CANDLE/Supervisor/templates/model_params/mnist1.txt
 python $CANDLE/Supervisor/templates/models/mnist/mnist_mlp.py
 ```
 
-In fact, this exact file is present in our CANDLE templates at `/data/BIDS-HPC/public/candle/Supervisor/templates/run_without_candle.sh`.  Feel free to run that file as-is to help you see how things work (`sbatch /data/BIDS-HPC/public/candle/Supervisor/templates/run_without_candle.sh`) or copy it to your local directory and edit it to test how well you made your code CANDLE-compliant (only the last two non-commented-out lines truly need be modified).
+In fact, this [exact file](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/run_without_candle.sh) is one of our [CANDLE templates](https://github.com/ECP-CANDLE/Supervisor/tree/fnlcr/templates).  Feel free to run that file as-is to help you see how things work (`sbatch $CANDLE/Supervisor/templates/run_without_candle.sh`) or copy it to your local directory and [edit it](https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_modify_the_candle_templates) to test how well you made your code CANDLE-compliant (only the last two non-commented-out lines truly need be modified).
 
 ## Notes
 
-* Sample CANDLE-compliant scripts can be found [here](https://github.com/ECP-CANDLE/Supervisor/tree/develop/templates/models).
+* *CANDLE supports scripts written in Python by default; documentation for our [language-agnostic scripts](https://github.com/ECP-CANDLE/Supervisor/tree/fnlcr/templates/language_agnostic) is forthcoming.
+* Sample CANDLE-compliant scripts can be found [here](https://github.com/ECP-CANDLE/Supervisor/tree/fnlcr/templates/models).
 * More details on writing CANDLE-compliant code can be found [here](https://ecp-candle.github.io/Candle/html/tutorials/writing_candle_code.html).
 * You can check GPU utilization on a compute node using `watch nvidia-smi` (use Ctrl+C to exit out of the `watch` command).
+* The `Supervisor` top directory referred to by links above that point to GitHub is present on Biowulf at `$CANDLE/Supervisor` (if you have the `candle` module loaded) or `/data/BIDS-HPC/public/candle/Supervisor`. In the links, just remove "blob/fnlcr/" or "tree/fnlcr/".  E.g., the file described by the link [https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/model_params/mnist1.txt](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/model_params/mnist1.txt) is located on Biowulf at `/data/BIDS-HPC/public/candle/Supervisor/templates/model_params/mnist1.txt`.
 * Feel free to email [Andrew Weisman](mailto:andrew.weisman@nih.gov) with any questions.
