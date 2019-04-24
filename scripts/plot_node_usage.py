@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 # Read in the arguments to this script: the temporary text file that holds the timing information, the figure size to create, and the directory in which to create the new figure
 data = np.loadtxt(sys.argv[1], dtype='str')
-myfigsize = tuple(sys.argv[2])
+myfigsize = eval(sys.argv[2])
 figdir = sys.argv[3]
 
 # Extract the data from the data array
@@ -19,7 +19,7 @@ hpsets = np.array(range(data.shape[0]), dtype='uint8')
 hpsets2 = data[:,2]
 
 # Populate the array that will hold the timing data in plotting form
-on_times = np.zeros((len(unodes), np.max(times)+1), dtype='uint8')
+on_times = np.ones((len(unodes), np.max(times)+1), dtype='int8') * -1
 for iunode, unode in enumerate(unodes):
     wh = np.where(nodes==unode)[0]
     for iwh in range(len(wh)):
