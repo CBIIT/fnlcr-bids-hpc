@@ -35,7 +35,8 @@ navbar-links:
   #  - GitHub Pages: "https://pages.github.com/"
   #Author's home: "http://deanattali.com"
   CANDLE on Biowulf:
-    - Introduction: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/candle_landing_page"
+#    - Introduction: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/candle_landing_page"
+    - Introduction: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle"
     - How to run CANDLE on Biowulf: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_run_candle_on_biowulf"
     - How to modify the CANDLE templates: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_modify_the_candle_templates"
     - How to make your code CANDLE-compliant: "https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_make_your_code_candle_compliant"
