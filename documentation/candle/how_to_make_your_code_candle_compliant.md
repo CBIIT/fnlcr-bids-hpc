@@ -116,7 +116,7 @@ def run(gParameters):
 
 Note that this only needs to be done once per variable, when it is first defined.
 
-While the dictionary "keys" (e.g., the argument to gParameters above) need not match the names of the variables being assigned, they must match the names of the keywords defined in the default parameters file, described next.
+While the dictionary "keys" (e.g., the argument to `gParameters` above) need not match the names of the variables being assigned, they must match the names of the keywords defined in the default parameters file, described next.
 
 ## Step (5): Create a default parameters file
 
@@ -157,7 +157,7 @@ export DEFAULT_PARAMS_FILE="$CANDLE/Supervisor/templates/model_params/mnist1.txt
 python $CANDLE/Supervisor/templates/models/mnist/mnist_mlp.py
 ```
 
-In fact, this [exact file](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/run_without_candle.sh) is one of our [CANDLE templates](https://github.com/ECP-CANDLE/Supervisor/tree/fnlcr/templates).  Feel free to run that file as-is to help you see how things work (`sbatch $CANDLE/Supervisor/templates/run_without_candle.sh`) or copy it to your local directory and [edit it](https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_modify_the_candle_templates) to test how well you made your code CANDLE-compliant (only the last two non-commented-out lines truly need be modified).
+In fact, this [exact file](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/run_without_candle.sh) is one of our [CANDLE templates](https://github.com/ECP-CANDLE/Supervisor/tree/fnlcr/templates).  Feel free to run that file as-is to help you see how things work (`sbatch $CANDLE/Supervisor/templates/run_without_candle.sh`) or copy it to your local directory and [edit it](https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_modify_the_candle_templates) to test how well you made your code CANDLE-compliant.
 
 ## Notes
 

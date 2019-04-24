@@ -30,7 +30,7 @@ fi
 if [ "a$ret1" == "a0" ] && [ "a$ret2" == "a0" ]; then
     echo -e "\nYou are now ready to submit a CANDLE job! Either:\n"
     echo -e "  (1) Run './$submission_script' to submit a sample CANDLE job (no 'sbatch' needed)"
-    echo -e "  (2) First modify $submission_script using XXXX as a guide and then submit your own CANDLE job by running './$submission_script' (no 'sbatch' needed)\n"
+    echo -e "  (2) First modify $submission_script using https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_modify_the_candle_templates as a guide and then submit your own CANDLE job by running './$submission_script' (no 'sbatch' needed)\n"
 else
     echo -e "\nAn error occurred; see error message(s) above\n"
 fi
