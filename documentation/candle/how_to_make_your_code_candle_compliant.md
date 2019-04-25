@@ -123,7 +123,7 @@ While the dictionary "keys" (e.g., the argument to `gParameters` above) need not
 In order to initialize the parameters for any given run, you need a configuration file that sets their default values.  Here is an [example such file](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/model_params/mnist1.txt):
 
 ```
-[Global_Params]
+[Global Params]
 epochs=20
 batch_size=128
 activation='relu'
@@ -147,8 +147,12 @@ For example, we would test that we've made our [template MNIST example](https://
 #SBATCH --time=00:05:00
 #SBATCH --job-name=mnist_test_no_candle
 
-# Set up environment
-module load python/3.6 candle
+# Always load the candle module for, e.g., finding the Benchmark class... DO NOT MODIFY
+module load candle
+
+# Load desired Python version or Conda environment
+# Load other custom environment settings here
+module load python/3.6
 
 # Set the file that the Python script below will read in order to determine the model parameters
 export DEFAULT_PARAMS_FILE="$CANDLE/Supervisor/templates/model_params/mnist1.txt"
