@@ -33,7 +33,7 @@ ax = fig.gca()
 # Plot the timing data
 for ihpset in hpsets:
     node_ind, time_ind = np.where(on_times==ihpset)
-    colors = ['C'+str(ihpset) for x in range(len(node_ind))]
+    colors = ['C'+str(ihpset%10) for x in range(len(node_ind))]
     ax.scatter(time_ind/60, node_ind, c=colors)
 
 # Set the figure properties
