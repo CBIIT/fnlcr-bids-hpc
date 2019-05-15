@@ -1,10 +1,11 @@
-# Don't forget to do this before running this Python script
+# Don't forget to do this before running this Python script:
 # module load python/3.6
 
 # Inputs
 nlayers = 6
 neach = 2500
-fnlcr_bids_hpc_path = '/data/BIDS-HPC/public/software/checkouts/fnlcr-bids-hpc'
+#fnlcr_bids_hpc_path = '/data/BIDS-HPC/public/software/checkouts/fnlcr-bids-hpc'
+fnlcr_bids_hpc_path = '/home/weismanal/checkouts/fnlcr-bids-hpc'
 imgaug_path = '/data/BIDS-HPC/public/software/checkouts/imgaug'
 # Shapes of the following four numpy arrays are (N,H,W)
 roi1_images_npy_file = '/data/BIDS-HPC/private/projects/cmm/roi1_images.npy'
@@ -19,7 +20,7 @@ import numpy as np
 import sys, os, time
 
 # Import our Python modules
-sys.path.append(fnlcr_bids_hpc_path)
+sys.path.append(fnlcr_bids_hpc_path+'/packages')
 import image_segmentation.utils as imseg_utils # import the utils module
 from image_segmentation.image_augmentation import augment_images # import the augment_images function in the image_augmentation module
 
@@ -55,7 +56,8 @@ masks = np.concatenate((roi1_masks, roi2_masks))
 # aug_params and composite_sequence will use default values since they are set to None. To customize these, take as examples the settings in fnlcr-bids-hpc/image_segmentation/image_augmentation.py
 os.mkdir(composite_output_dir)
 time_start = time.time()
-images_aug, masks_aug = augment_images(images, masks=masks, num_aug=1, output_dir=composite_output_dir, imgaug_repo=imgaug_path, aug_params=None, composite_sequence=None)
+#images_aug, masks_aug = augment_images(images, masks=masks, num_aug=1, output_dir=composite_output_dir, imgaug_repo=imgaug_path, aug_params=None, composite_sequence=None)
+images_aug, masks_aug = augment_images(images, masks=masks, num_aug=1, output_dir=composite_output_dir)
 time_end = time.time()
 print('Composite augmentation took {:4.1f} min'.format((time_end-time_start)/60))
 
@@ -65,7 +67,8 @@ print('Composite augmentation took {:4.1f} min'.format((time_end-time_start)/60)
 # aug_params and individual_seqs_and_outnames will use default values since they are set to None. To customize these, take as examples the settings in fnlcr-bids-hpc/image_segmentation/image_augmentation.py
 os.mkdir(individual_output_dir)
 time_start = time.time()
-images_aug_indiv_list = augment_images(images, num_aug=1, do_composite=False, output_dir=individual_output_dir, imgaug_repo=imgaug_path, aug_params=None, individual_seqs_and_outnames=None)
+#images_aug_indiv_list = augment_images(images, num_aug=1, do_composite=False, output_dir=individual_output_dir, imgaug_repo=imgaug_path, aug_params=None, individual_seqs_and_outnames=None)
+images_aug_indiv_list = augment_images(images, num_aug=1, do_composite=False, output_dir=individual_output_dir)
 time_end = time.time()
 print('Individual augmentations took {:4.1f} min total'.format((time_end-time_start)/60))
 

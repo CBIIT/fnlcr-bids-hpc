@@ -49,8 +49,8 @@ def testing__image_augmentation__augment_images():
     import os
 
     # Constant
-    #imgaug_path = '/data/BIDS-HPC/public/software/checkouts/imgaug'
-    imgaug_path = '/Users/weismanal/checkouts/imgaug'
+    imgaug_path = '/data/BIDS-HPC/public/software/checkouts/imgaug'
+    #imgaug_path = '/Users/weismanal/checkouts/imgaug'
     curr_dir = os.path.dirname(os.path.realpath(__file__))
 
     # Input image definitions

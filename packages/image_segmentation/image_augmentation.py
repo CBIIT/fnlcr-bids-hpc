@@ -1,18 +1,18 @@
 """
 .. module:: image_augmentation
-   :platform: Linux
    :synopsis: This is the module used for augmenting images, the main function of which is augment_images().
-
+        This module implements the imgaug package with reasonable, working-out-of-the-box settings as a template for further usage.
+        Note: This module the imgaug package, which can be acquired on GitHub at https://github.com/aleju/imgaug.
 .. moduleauthor:: Andrew Weisman <andrew.weisman@nih.gov>
 """
 
-# This module implements the imgaug package with reasonable, working-out-of-the-box settings as a template for further usage.
-# Note: This requires the imgaug package, which can be acquired on GitHub at https://github.com/aleju/imgaug
 
-# Augmentation parameters structure; this is a nice set of settings that worked well previously
-class example_augmentation_parameters():
-    """This provides a nice set of default augmentation parameters."""
+class AugmentationSettings:
+    """Class specifying the augmentation parameters and sequences to apply and from which a new class can be inherited if desired;
+    default values/sequences are already-working sets.
+    """
     def __init__(self):
+        # Define a nice default set of augmentation parameters
         self.flip_factor = 0.5
         self.add_vals = (-30,30)
         self.multiply_factors = (0.75,1.25)
@@ -24,51 +24,58 @@ class example_augmentation_parameters():
         self.rotation_degrees = (-90,90)
         self.scale_factors = (0.8,1.2)
 
-# Composite sequence of augmentations; this is a nice set that worked well previously
-def example_composite_sequence(aug_params):
-    """This provides a nice default composite sequence."""
-    from imgaug import augmenters as iaa
-    return(iaa.Sequential([
-        iaa.Flipud(aug_params.flip_factor),
-        iaa.Fliplr(aug_params.flip_factor),
-        iaa.Sometimes(0.5,
+    # Define a nice default composite sequence of augmentations
+    def composite_sequence(self):
+        """Return the composite sequence to run, i.e., a set of transformations to all be applied to a set of images and/or masks.
+
+        :returns: Sequential object from the augmenters module of the imgaug package
+        """
+        from imgaug import augmenters as iaa
+        return(iaa.Sequential([
+            iaa.Flipud(self.flip_factor),
+            iaa.Fliplr(self.flip_factor),
+            iaa.Sometimes(0.5,
+                iaa.OneOf([
+                    iaa.GaussianBlur(sigma=self.gaussian_blur_sigma),
+                    #iaa.AverageBlur(k=self.average_blur_pixels), # There at least used to be a weird shift for this augmentation so I removed it
+                    iaa.MedianBlur(k=self.median_blur_pixels)
+                ])),
+            iaa.ContrastNormalization(self.contrast_normalization_factors),
+            iaa.AdditiveGaussianNoise(loc=0,scale=(self.gaussian_noise_vals)),
             iaa.OneOf([
-                iaa.GaussianBlur(sigma=aug_params.gaussian_blur_sigma),
-                #iaa.AverageBlur(k=aug_params.average_blur_pixels), # There at least used to be a weird shift for this augmentation so I removed it
-                iaa.MedianBlur(k=aug_params.median_blur_pixels)
-            ])),
-        iaa.ContrastNormalization(aug_params.contrast_normalization_factors),
-        iaa.AdditiveGaussianNoise(loc=0,scale=(aug_params.gaussian_noise_vals)),
-        iaa.OneOf([
-            iaa.Add(aug_params.add_vals),
-            iaa.Multiply(aug_params.multiply_factors)
-        ]),
-        iaa.Affine(
-            rotate=aug_params.rotation_degrees,
-            scale=aug_params.scale_factors
-        )
-    ]))
+                iaa.Add(self.add_vals),
+                iaa.Multiply(self.multiply_factors)
+            ]),
+            iaa.Affine(
+                rotate=self.rotation_degrees,
+                scale=self.scale_factors
+            )
+        ]))
 
-# Sample set of individual augmentations in order to see what they do individually
-def example_individual_seqs_and_outnames(aug_params):
-    """This provides a nice set of default individual augmentations."""
-    from imgaug import augmenters as iaa
-    return([
-        [iaa.Sequential(iaa.Flipud(1)), 'flipud'],
-        [iaa.Sequential(iaa.Fliplr(1)), 'fliplr'],
-        [iaa.Sequential(iaa.Add((aug_params.add_vals[0],aug_params.add_vals[0]))), 'add_low'],
-        [iaa.Sequential(iaa.Add((aug_params.add_vals[1],aug_params.add_vals[1]))), 'add_high'],
-        [iaa.Sequential(iaa.Multiply((aug_params.multiply_factors[0],aug_params.multiply_factors[0]))), 'multiply_low'],
-        [iaa.Sequential(iaa.Multiply((aug_params.multiply_factors[1],aug_params.multiply_factors[1]))), 'multiply_high'],
-        [iaa.Sequential(iaa.GaussianBlur(sigma=(aug_params.gaussian_blur_sigma[1],aug_params.gaussian_blur_sigma[1]))), 'gaussian_blur'],
-        [iaa.Sequential(iaa.AverageBlur(k=(aug_params.average_blur_pixels[1],aug_params.average_blur_pixels[1]))), 'average_blur'],
-        [iaa.Sequential(iaa.MedianBlur(k=(aug_params.median_blur_pixels[1],aug_params.median_blur_pixels[1]))), 'median_blur'],
-        [iaa.Sequential(iaa.AdditiveGaussianNoise(loc=0,scale=(aug_params.gaussian_noise_vals[1],aug_params.gaussian_noise_vals[1]))), 'additive_gaussian_noise'],
-        [iaa.Sequential(iaa.ContrastNormalization((aug_params.contrast_normalization_factors[0],aug_params.contrast_normalization_factors[0]))), 'contrast_norm_low'],
-        [iaa.Sequential(iaa.ContrastNormalization((aug_params.contrast_normalization_factors[1],aug_params.contrast_normalization_factors[1]))), 'contrast_norm_high'],
-        [iaa.Sequential(iaa.Affine(rotate=aug_params.rotation_degrees,scale=aug_params.scale_factors)), 'affine']])
+    # Define a nice default set of individual augmentations in order to see what they do individually
+    def individual_seqs_and_outnames(self):
+        """Return a list of individual sequences to run, i.e., a set of transformations to be applied one-by-one to a set of images and/or masks in order to see what the augmentations do individually.
 
-def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=None, composite_sequence=None, individual_seqs_and_outnames=None, aug_params=None):
+        :returns: List of Sequential objects from the augmenters module of the imgaug package
+        """
+        from imgaug import augmenters as iaa
+        return([
+            [iaa.Sequential(iaa.Flipud(1)), 'flipud'],
+            [iaa.Sequential(iaa.Fliplr(1)), 'fliplr'],
+            [iaa.Sequential(iaa.Add((self.add_vals[0],self.add_vals[0]))), 'add_low'],
+            [iaa.Sequential(iaa.Add((self.add_vals[1],self.add_vals[1]))), 'add_high'],
+            [iaa.Sequential(iaa.Multiply((self.multiply_factors[0],self.multiply_factors[0]))), 'multiply_low'],
+            [iaa.Sequential(iaa.Multiply((self.multiply_factors[1],self.multiply_factors[1]))), 'multiply_high'],
+            [iaa.Sequential(iaa.GaussianBlur(sigma=(self.gaussian_blur_sigma[1],self.gaussian_blur_sigma[1]))), 'gaussian_blur'],
+            [iaa.Sequential(iaa.AverageBlur(k=(self.average_blur_pixels[1],self.average_blur_pixels[1]))), 'average_blur'],
+            [iaa.Sequential(iaa.MedianBlur(k=(self.median_blur_pixels[1],self.median_blur_pixels[1]))), 'median_blur'],
+            [iaa.Sequential(iaa.AdditiveGaussianNoise(loc=0,scale=(self.gaussian_noise_vals[1],self.gaussian_noise_vals[1]))), 'additive_gaussian_noise'],
+            [iaa.Sequential(iaa.ContrastNormalization((self.contrast_normalization_factors[0],self.contrast_normalization_factors[0]))), 'contrast_norm_low'],
+            [iaa.Sequential(iaa.ContrastNormalization((self.contrast_normalization_factors[1],self.contrast_normalization_factors[1]))), 'contrast_norm_high'],
+            [iaa.Sequential(iaa.Affine(rotate=self.rotation_degrees,scale=self.scale_factors)), 'affine']])
+
+#def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=None, composite_sequence=None, individual_seqs_and_outnames=None, aug_params=None):
+def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=None, AugSettingsClass=AugmentationSettings):
     """Augment images and/or masks.
 
     :param images: Images to augment;
@@ -83,32 +90,21 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
         number of output images will be N * num_aug
     :type num_aug: int.
     :param do_composite:
-        (Optional) Whether to do composite augmentations (multiple augmentations at once) or individual augmentations (for observing the effect of each augmentation);
-        only has an effect if either (1) both composite_sequence and individual_seqs_and_outnames are None or (2) both composite_sequence and individual_seqs_and_outnames are set
+        (Optional) Whether to do composite augmentations (multiple augmentations at once; True) or individual augmentations (for observing the effect of each augmentation; False)
     :type do_composite: bool.
     :param output_dir:
         (Optional) If not set to None, location where .tif images should be saved for observation purposes;
         if set to None, no saving will be done
     :type output_dir: str.
-    :param composite_sequence:
-        (Optional) Function specifying the sequence of augmentations to perform all at once;
-        if set to None, the default example_composite_sequence (below) is used;
-        to customize the composite sequence, create a function taking example_composite_sequence as an example
-    :type composite_sequence: func.
-    :param individual_seqs_and_outnames:
-        (Optional) Function specifying the individual augmentations to perform;
-        if set to None, the default example_individual_seqs_and_outnames (below) is used;
-        to customize the individual augmentations, create a function taking example_individual_seqs_and_outnames as an example
-    :type individual_seqs_and_outnames: func.
-    :param aug_params:
-        (Optional) Class specifying the augmentation parameters to apply to either composite or individual augmentations;
-        if set to None, the default example_augmentation_parameters (below) is used;
-        to customize the augmentation parameters, create a class taking example_augmentation_parameters as an example
-    :type aug_params: cls.
+    :param AugSettingsClass:
+        (Optional) Class specifying the augmentation parameters and sequences to apply; whether composite or individual augmentation is determined by the do_composite parameter
+        if set to None, the default base class AugmentationSettings, defined in this module, is used;
+        to customize the augmentation parameters only, instantiate from AugmentationSettings and modify the instance variables;
+        to customize the sequences as well, inherit a custom derived class from AugmentationSettings and override the composite_sequence and/or individual_seqs_and_outnames methods
+    :type AugSettingsClass: cls.
     :returns:
         * If do_composite=True: augmented images ((N,H,W,C)), and, if masks were input, augmented masks ((N,H,W)); these are both NumPy arrays of dtype='uint8'\n
         * If do_composite=False: list of augmented images ((N,H,W,C)), one for each individual augmentation; these are all NumPy arrays of dtype='uint8'\n
-        As mentioned above, note that do_composite can be set by setting one (and only one) of composite_sequence and individual_seqs_and_outnames to functions (i.e., not None)
     """
     # Tested in its own function in the testing module
 
@@ -127,9 +123,8 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
     from skimage import io
     from . import utils
 
-    # Allow the user to specify the augmentation parameters; if they don't, use a default set
-    if aug_params is None:
-        aug_params = example_augmentation_parameters()
+    # Instantiate from the input augmentation settings class, whether a base class or derived
+    aug_settings = AugSettingsClass()
 
     # Initialize the randomizer - note that by setting this you will get the same augmentations every run of the script
     ia.seed(1)
@@ -153,25 +148,12 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
         if masks is not None:
             utils.quick_overlay_output(images, masks, output_dir+'/'+'input-overlay.tif')
 
-    # Set do_composite in the non-ambiguous cases
-    if (composite_sequence is None) and (individual_seqs_and_outnames is not None):
-        do_composite = False
-    if (composite_sequence is not None) and (individual_seqs_and_outnames is None):
-        do_composite = True
-
     # If we want to do each augmentation individually in order to manually inspect exactly what each augmentation does...
     if not do_composite:
 
-        # Initialize the individual augmentations
-        if individual_seqs_and_outnames is None:
-            individual_seqs_and_outnames = example_individual_seqs_and_outnames
-
-        # Define the actual individual sequences and outnames
-        indiv_seqs_and_outnames = individual_seqs_and_outnames(aug_params)
-
         # For each augmentation...
         image_aug_list = []
-        for aug_num, seq_and_outname in enumerate(indiv_seqs_and_outnames, start=1):
+        for aug_num, seq_and_outname in enumerate(aug_settings.individual_seqs_and_outnames(), start=1):
             seq = seq_and_outname[0]
             outname = '{:02d}'.format(aug_num) + '-' + seq_and_outname[1]
 
@@ -209,13 +191,6 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
         else:
             do_masks = False
     
-        # Allow the user to specify the composite sequence; if they don't, use a default sequence
-        if composite_sequence is None:
-            composite_sequence = example_composite_sequence # Note it's important to not put the parentheses after composite_sequence_example because we want composite_sequence to be a function itself, as opposed to the return value of a function that is called
-
-        # Set the composite sequence according to the augmentation parameters
-        compos_seq = composite_sequence(aug_params)
-
         # Define the arrays to contain the stack for the current single augmentation
         image_aug = []
         if do_masks:
@@ -223,7 +198,7 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
 
         # For each image in the stack...
         for i in range(N):
-            seq_det = compos_seq.to_deterministic()
+            seq_det = aug_settings.composite_sequence().to_deterministic()
             img_channels = []
             for ic in range(C):
                 img_channels.append(seq_det.augment_image(images[i,:,:,ic].squeeze()))
