@@ -1,9 +1,11 @@
 
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Documentation for the the fnlcr-bids-hpc GitHub repository &#8212; FNLCR-BIDS-HPC  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -11,7 +13,6 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Welcome to FNLCR-BIDS-HPC’s documentation!" href="index.html" />
@@ -34,63 +35,77 @@
   <div class="section" id="module-image_segmentation">
 <span id="documentation-for-the-the-fnlcr-bids-hpc-github-repository"></span><h1>Documentation for the the fnlcr-bids-hpc GitHub repository<a class="headerlink" href="#module-image_segmentation" title="Permalink to this headline">¶</a></h1>
 <p>Documentation for the image_segmentation module.</p>
-<span class="target" id="module-image_segmentation.image_augmentation"></span><span class="target" id="module-image_augmentation"></span><dl class="function">
+<span class="target" id="module-image_segmentation.image_augmentation"></span><span class="target" id="module-image_augmentation"></span><dl class="class">
+<dt id="image_segmentation.image_augmentation.AugmentationSettings">
+<em class="property">class </em><code class="descclassname">image_segmentation.image_augmentation.</code><code class="descname">AugmentationSettings</code><a class="headerlink" href="#image_segmentation.image_augmentation.AugmentationSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class specifying the augmentation parameters and sequences to apply and from which a new class can be inherited if desired;
+default values/sequences are already-working sets.</p>
+<dl class="method">
+<dt id="image_segmentation.image_augmentation.AugmentationSettings.composite_sequence">
+<code class="descname">composite_sequence</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#image_segmentation.image_augmentation.AugmentationSettings.composite_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the composite sequence to run, i.e., a set of transformations to all be applied to a set of images and/or masks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Sequential object from the augmenters module of the imgaug package</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="image_segmentation.image_augmentation.AugmentationSettings.individual_seqs_and_outnames">
+<code class="descname">individual_seqs_and_outnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#image_segmentation.image_augmentation.AugmentationSettings.individual_seqs_and_outnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of individual sequences to run, i.e., a set of transformations to be applied one-by-one to a set of images and/or masks in order to see what the augmentations do individually.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of Sequential objects from the augmenters module of the imgaug package</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
 <dt id="image_segmentation.image_augmentation.augment_images">
-<code class="descclassname">image_segmentation.image_augmentation.</code><code class="descname">augment_images</code><span class="sig-paren">(</span><em>images</em>, <em>masks=None</em>, <em>num_aug=1</em>, <em>do_composite=True</em>, <em>output_dir=None</em>, <em>composite_sequence=None</em>, <em>individual_seqs_and_outnames=None</em>, <em>aug_params=None</em><span class="sig-paren">)</span><a class="headerlink" href="#image_segmentation.image_augmentation.augment_images" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">image_segmentation.image_augmentation.</code><code class="descname">augment_images</code><span class="sig-paren">(</span><em>images</em>, <em>masks=None</em>, <em>num_aug=1</em>, <em>do_composite=True</em>, <em>output_dir=None</em>, <em>AugSettingsClass=&lt;class 'image_segmentation.image_augmentation.AugmentationSettings'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#image_segmentation.image_augmentation.augment_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Augment images and/or masks.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>images</strong> – Images to augment;
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>images</strong> – Images to augment;
 NumPy array of shape (H,W), (H,W,3), (N,H,W), or (N,H,W,3);
-values can be in range [0,1], [0,2^8-1], or [0,2^16-1]</p></li>
-<li><p><strong>masks</strong> – (Optional) Masks to correspondingly augment;
+values can be in range [0,1], [0,2^8-1], or [0,2^16-1]</li>
+<li><strong>masks</strong> – (Optional) Masks to correspondingly augment;
 NumPy array of shape (H,W) or (N,H,W);
-values are 0 and positive integers</p></li>
-<li><p><strong>num_aug</strong> (<em>int.</em>) – (Optional) Number of augmentations to perform;
-number of output images will be N * num_aug</p></li>
-<li><p><strong>do_composite</strong> (<em>bool.</em>) – (Optional) Whether to do composite augmentations (multiple augmentations at once) or individual augmentations (for observing the effect of each augmentation);
-only has an effect if either (1) both composite_sequence and individual_seqs_and_outnames are None or (2) both composite_sequence and individual_seqs_and_outnames are set</p></li>
-<li><p><strong>output_dir</strong> (<em>str.</em>) – (Optional) If not set to None, location where .tif images should be saved for observation purposes;
-if set to None, no saving will be done</p></li>
-<li><p><strong>composite_sequence</strong> (<em>func.</em>) – (Optional) Function specifying the sequence of augmentations to perform all at once;
-if set to None, the default example_composite_sequence (below) is used;
-to customize the composite sequence, create a function taking example_composite_sequence as an example</p></li>
-<li><p><strong>individual_seqs_and_outnames</strong> (<em>func.</em>) – (Optional) Function specifying the individual augmentations to perform;
-if set to None, the default example_individual_seqs_and_outnames (below) is used;
-to customize the individual augmentations, create a function taking example_individual_seqs_and_outnames as an example</p></li>
-<li><p><strong>aug_params</strong> (<em>cls.</em>) – (Optional) Class specifying the augmentation parameters to apply to either composite or individual augmentations;
-if set to None, the default example_augmentation_parameters (below) is used;
-to customize the augmentation parameters, create a class taking example_augmentation_parameters as an example</p></li>
+values are 0 and positive integers</li>
+<li><strong>num_aug</strong> (<em>int.</em>) – (Optional) Number of augmentations to perform;
+number of output images will be N * num_aug</li>
+<li><strong>do_composite</strong> (<em>bool.</em>) – (Optional) Whether to do composite augmentations (multiple augmentations at once; True) or individual augmentations (for observing the effect of each augmentation; False)</li>
+<li><strong>output_dir</strong> (<em>str.</em>) – (Optional) If not set to None, location where .tif images should be saved for observation purposes;
+if set to None, no saving will be done</li>
+<li><strong>AugSettingsClass</strong> (<em>cls.</em>) – (Optional) Class specifying the augmentation parameters and sequences to apply; whether composite or individual augmentation is determined by the do_composite parameter
+if set to None, the default base class AugmentationSettings, defined in this module, is used;
+to customize the augmentation parameters only, instantiate from AugmentationSettings and modify the instance variables;
+to customize the sequences as well, inherit a custom derived class from AugmentationSettings and override the composite_sequence and/or individual_seqs_and_outnames methods</li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p>If do_composite=True: augmented images ((N,H,W,C)), and, if masks were input, augmented masks ((N,H,W)); these are both NumPy arrays of dtype=’uint8’</p></li>
-<li><p>If do_composite=False: list of augmented images ((N,H,W,C)), one for each individual augmentation; these are all NumPy arrays of dtype=’uint8’</p></li>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li>If do_composite=True: augmented images ((N,H,W,C)), and, if masks were input, augmented masks ((N,H,W)); these are both NumPy arrays of dtype=’uint8’</li>
+<li>If do_composite=False: list of augmented images ((N,H,W,C)), one for each individual augmentation; these are all NumPy arrays of dtype=’uint8’</li>
 </ul>
-<p>As mentioned above, note that do_composite can be set by setting one (and only one) of composite_sequence and individual_seqs_and_outnames to functions (i.e., not None)</p>
 </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="class">
-<dt id="image_segmentation.image_augmentation.example_augmentation_parameters">
-<em class="property">class </em><code class="descclassname">image_segmentation.image_augmentation.</code><code class="descname">example_augmentation_parameters</code><a class="headerlink" href="#image_segmentation.image_augmentation.example_augmentation_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>This provides a nice set of default augmentation parameters.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="image_segmentation.image_augmentation.example_composite_sequence">
-<code class="descclassname">image_segmentation.image_augmentation.</code><code class="descname">example_composite_sequence</code><span class="sig-paren">(</span><em>aug_params</em><span class="sig-paren">)</span><a class="headerlink" href="#image_segmentation.image_augmentation.example_composite_sequence" title="Permalink to this definition">¶</a></dt>
-<dd><p>This provides a nice default composite sequence.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="image_segmentation.image_augmentation.example_individual_seqs_and_outnames">
-<code class="descclassname">image_segmentation.image_augmentation.</code><code class="descname">example_individual_seqs_and_outnames</code><span class="sig-paren">(</span><em>aug_params</em><span class="sig-paren">)</span><a class="headerlink" href="#image_segmentation.image_augmentation.example_individual_seqs_and_outnames" title="Permalink to this definition">¶</a></dt>
-<dd><p>This provides a nice set of default individual augmentations.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -131,6 +146,8 @@ to customize the augmentation parameters, create a class taking example_augmenta
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
@@ -151,7 +168,7 @@ to customize the augmentation parameters, create a class taking example_augmenta
       &copy;2019, BIDS-HPC.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
