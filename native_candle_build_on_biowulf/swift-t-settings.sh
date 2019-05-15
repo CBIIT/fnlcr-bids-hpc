@@ -1,13 +1,19 @@
-CANDLE=/data/BIDS-HPC/public/candle
+#!/bin/bash
+
+#CANDLE=/data/BIDS-HPC/public/candle
+CANDLE=/data/BIDS-HPC/public/software/distributions/candle/2019-05-06
 
 #mympiroot=/usr/local/OpenMPI/3.0.0/gcc-7.2.0-pmi2
 #mympiroot=/usr/local/OpenMPI/3.1.3/gcc-7.4.0-pmi2
-mympiroot=/usr/local/OpenMPI/3.1.2/CUDA-9.0/gcc-7.3.0-pmi2
+#mympiroot=/usr/local/OpenMPI/3.1.2/CUDA-9.0/gcc-7.3.0-pmi2
+mympiroot=/data/BIDS-HPC/public/software/builds/mpich-3.3-3
 mytclroot=/usr/local/Tcl_Tk/8.6.8/gcc_7.2.0
 myrroot=/usr/local/apps/R/3.5/3.5.0_build2/lib64/R
 myantroot=/usr/local/apps/ant/1.10.3
 mypyroot=/usr/local/Anaconda/envs/py3.6
 export SWIFT_T_SRC_ROOT=$CANDLE/swift-t
+CUSTOM_CONFIGURE_ARGS="--with-launcher=/usr/local/slurm/bin/srun" # NOTE: The line "EXTRA_ARGS=""" in build-turbine.sh must be changed to "EXTRA_ARGS="${CUSTOM_CONFIGURE_ARGS:-}"" in order for this setting to have any effect!
+
 
 # SWIFT/T SETTINGS
 
