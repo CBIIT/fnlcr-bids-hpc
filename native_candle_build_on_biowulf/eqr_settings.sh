@@ -3,7 +3,8 @@
 myrroot=/usr/local/apps/R/3.5/3.5.0_build2/lib64/R
 mytclroot=/usr/local/Tcl_Tk/8.6.8/gcc_7.2.0
 #CANDLE=/data/BIDS-HPC/public/candle
-R_LOCAL_LIB=/data/BIDS-HPC/public/software/builds/versions/R/R-2019-04-04/libs
+#R_LOCAL_LIB=/data/BIDS-HPC/public/software/builds/versions/R/R-2019-04-04/libs
+R_LOCAL_LIB=/data/BIDS-HPC/public/software/distributions/candle/2019-05-06/builds/R/libs
 
 # R system-wide install where libraries and includes have
 # a different parent and optional packages are installed within
