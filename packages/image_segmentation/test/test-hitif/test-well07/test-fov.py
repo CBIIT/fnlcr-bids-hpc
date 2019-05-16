@@ -8,10 +8,6 @@ from augment_hitif import hitif_aug
 
 augmenter = hitif_aug("configuration-well07.cfg")
 
-#file_name="AssayPlate_PerkinElmer_CellCarrier-384 Ultra_B07_T0001F002L01A01Z01C01.tif"
-#fov_dir="/data/HiTIF/data/dl_segmentation_input/HiTIF_colorectal/input/exp2"
-#gt_dir="/data/HiTIF/data/dl_segmentation_input/HiTIF_colorectal/ground_truth/exp2"
-
 file_name="Row0-NNI-1by1.tif"
 fov_dir="."
 gt_dir="."
