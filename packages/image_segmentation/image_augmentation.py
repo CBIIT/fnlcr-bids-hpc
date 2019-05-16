@@ -122,11 +122,15 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
     from imgaug import augmenters as iaa
     import numpy as np
     from skimage import io
-    from . import utils
+    import utils
+    #from . import utils
 
     # Instantiate from the input augmentation settings class, whether a base class or derived
     if AugSettings == None:
         aug_settings = AugmentationSettings()
+    else:
+        aug_settings = AugSettings
+
 
     # Initialize the randomizer - note that by setting this you will get the same augmentations every run of the script
     ia.seed(1)
@@ -170,7 +174,6 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
 
             # Convert the lists to numpy arrays
             image_aug = np.array(image_aug,dtype=np.uint8)
-
             # Transpose the indices since they come out like (N,C,H,W)
             image_aug = np.transpose(image_aug,[0,2,3,1]) # comes out as (N,H,W,C)
 
