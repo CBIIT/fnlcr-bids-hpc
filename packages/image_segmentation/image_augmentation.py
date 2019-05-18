@@ -75,7 +75,7 @@ class AugmentationSettings:
             [iaa.Sequential(iaa.Affine(rotate=self.rotation_degrees,scale=self.scale_factors)), 'affine']])
 
 #def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=None, composite_sequence=None, individual_seqs_and_outnames=None, aug_params=None):
-def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=None, AugSettingsClass=AugmentationSettings):
+def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=None, AugSettings=None):
     """Augment images and/or masks.
 
     :param images: Images to augment;
@@ -96,8 +96,9 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
         (Optional) If not set to None, location where .tif images should be saved for observation purposes;
         if set to None, no saving will be done
     :type output_dir: str.
-    :param AugSettingsClass:
-        (Optional) Class specifying the augmentation parameters and sequences to apply; whether composite or individual augmentation is determined by the do_composite parameter
+    :param AugSettings:
+        (Optional)  Object of the class that inherists from AugmentationSettings specifying the augmentation parameters and sequences to apply; whether composite or individual augmentation is determined by the do_composite parameter
+
         if set to None, the default base class AugmentationSettings, defined in this module, is used;
         to customize the augmentation parameters only, instantiate from AugmentationSettings and modify the instance variables;
         to customize the sequences as well, inherit a custom derived class from AugmentationSettings and override the composite_sequence and/or individual_seqs_and_outnames methods
@@ -121,10 +122,15 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
     from imgaug import augmenters as iaa
     import numpy as np
     from skimage import io
-    from . import utils
+    import utils
+    #from . import utils
 
     # Instantiate from the input augmentation settings class, whether a base class or derived
-    aug_settings = AugSettingsClass()
+    if AugSettings == None:
+        aug_settings = AugmentationSettings()
+    else:
+        aug_settings = AugSettings
+
 
     # Initialize the randomizer - note that by setting this you will get the same augmentations every run of the script
     ia.seed(1)
@@ -168,7 +174,6 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
 
             # Convert the lists to numpy arrays
             image_aug = np.array(image_aug,dtype=np.uint8)
-
             # Transpose the indices since they come out like (N,C,H,W)
             image_aug = np.transpose(image_aug,[0,2,3,1]) # comes out as (N,H,W,C)
 
