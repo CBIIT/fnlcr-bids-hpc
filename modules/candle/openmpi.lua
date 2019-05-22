@@ -14,6 +14,8 @@ setenv("CANDLE", base) -- used by submit_candle_job.sh, run_without_candle.sh, a
  -- append_path("PATH", pathJoin(base,"scripts")) -- used only in order to find the copy_candle_template script
 append_path("PATH", pathJoin(base,"Supervisor/templates/scripts")) -- used only in order to find the copy_candle_template script
 setenv("SITE", "biowulf") -- used by submit_candle_job.sh
+setenv("TURBINE_HOME", pathJoin(base,"builds/swift-t-install/turbine"))
+setenv("MODULES_FOR_BUILD", "python/3.6")
 
 if (mode() == "load") then
     LmodMessage("[+] Loading  ", app, version, " ...")
