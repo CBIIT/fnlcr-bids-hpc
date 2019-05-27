@@ -14,6 +14,7 @@ append_path("PATH", pathJoin(base,"Supervisor/templates/scripts")) -- used only 
 setenv("SITE", "biowulf") -- used by submit_candle_job.sh
 setenv("TURBINE_HOME", pathJoin(base,"builds/swift-t-install/turbine"))
 setenv("MODULES_FOR_BUILD", "python/3.6")
+setenv("DEFAULT_R_MODULE", "R/3.5.2")
 
 if (mode() == "load") then
     LmodMessage("[+] Loading  ", app, version, " ...")
