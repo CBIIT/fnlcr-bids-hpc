@@ -1,3 +1,7 @@
+---
+bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
+title: Beta CANDLE instructions
+---
 ## Sample job (MNIST)
 
 ```bash
