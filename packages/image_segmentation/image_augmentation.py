@@ -107,15 +107,6 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
         * If do_composite=True: augmented images ((N,H,W,C)), and, if masks were input, augmented masks ((N,H,W)); these are both NumPy arrays of dtype='uint8'\n
         * If do_composite=False: list of augmented images ((N,H,W,C)), one for each individual augmentation; these are all NumPy arrays of dtype='uint8'\n
     """
-    # Tested in its own function in the testing module
-
-    # Temporarily hardcoded until modules is implemented
-    imgaug_repo = '/data/BIDS-HPC/public/software/checkouts/imgaug'
-    #imgaug_repo = '/Users/weismanal/checkouts/imgaug'
-
-    # Since imgaug is a GitHub repo, we need to point to where the clone is so we can import the library
-    import sys
-    sys.path.append(imgaug_repo)
 
     # Import relevant modules
     import imgaug as ia
@@ -131,9 +122,9 @@ def augment_images(images, masks=None, num_aug=1, do_composite=True, output_dir=
     else:
         aug_settings = AugSettings
 
-
-    # Initialize the randomizer - note that by setting this you will get the same augmentations every run of the script
-    ia.seed(1)
+    import os
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
 
     # Preprocess the images and masks (note that masks in imgaug are assumed to be integer-based, bool, or float-based; we're settling on int16)
     images = utils.normalize_images(images,1) # ensure the images are uint8; inputs can therefore be [0,1], [0,2^8-1], or [0,2^16-1]
