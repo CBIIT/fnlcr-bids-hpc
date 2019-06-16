@@ -13,7 +13,8 @@
 #module load R/3.5.0 gcc/7.3.0 openmpi/3.1.2/cuda-9.0/gcc-7.3.0-pmi2 tcl_tk/8.6.8_gcc-7.2.0 python/3.6 ant/1.10.3 java/1.8.0_181
 
 # For 5-6-19 build
-# CANDLE=/data/BIDS-HPC/public/software/distributions/candle/2019-05-06
+#CANDLE=/data/BIDS-HPC/public/software/distributions/candle/2019-05-06
+#CANDLE=/data/BIDS-HPC/public/software/distributions/candle/mpich
 # export SWIFT_T_INSTALL=$CANDLE/builds/swift-t-install
 # export R_INSTALL=$CANDLE/builds/R
 # module load R/3.5.0 tcl_tk/8.6.8_gcc-7.2.0 python/3.6 ant/1.10.3 java/1.8.0_181
@@ -28,7 +29,7 @@
 # export CPATH=/data/BIDS-HPC/public/software/builds/mpich-3.3-3/include:$CPATH
 # export LD_PRELOAD=/usr/local/slurm/lib/libslurm.so:$LD_PRELOAD
 
-module load mpich2/3.2.1/gcc-5.5.0 gcc/5.5.0
+#module load mpich2/3.2.1/gcc-5.5.0 gcc/5.5.0
 
 # #module load R/3.5.0 gcc/5.5.0 mpich2/3.2.1/gcc-5.5.0 tcl_tk/8.6.8_gcc-5.5.0 python/3.6 ant/1.10.3 java/1.8.0_181
 # module load R/3.5.0
@@ -55,7 +56,7 @@ module load mpich2/3.2.1/gcc-5.5.0 gcc/5.5.0
 # mkdir $R_LIBS
 
 #### TEST MPI COMMUNICATIONS ####
-if [ 1 -eq 1 ]; then
+if [ 0 -eq 1 ]; then
     #mpicc hello.c
     #srun -n 3 a.out
     #srun -n 3 /home/weismanal/checkouts/fnlcr-bids-hpc/native_candle_build_on_biowulf/a.out
@@ -117,7 +118,6 @@ if [ 0 -eq 1 ]; then
     
 fi
 
-
 #### TEST ####
 # Testing done on "sinteractive -n 3 -N 3 --gres=gpu:k20x:1 --mem=20G --no-gres-shell"
 
@@ -131,15 +131,14 @@ export ADLB_DEBUG_HOSTMAP=1
 #    # Test MPI
 #    srun -n 1 python $CANDLE/Benchmarks/Pilot1/P1B3/p1b3_baseline_keras2.py
 
+    # (3) Test Swift/T
+    swift-t -n 3 mytest2.swift
+
 if [ 0 -eq 1 ]; then
 
     # (2)
     mpicc hello.c
     srun -n 3 a.out
-
-    # (3) Test Swift/T
-    #swift-t -n 3 mytest2.swift
-    swift-t -n 3 mytest2.swift
 
     # (4)
     swift-t -n 3 -r $(pwd) myextension.swift

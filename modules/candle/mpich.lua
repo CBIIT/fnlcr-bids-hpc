@@ -17,6 +17,10 @@ setenv("TURBINE_HOME", pathJoin(base,"builds/swift-t-install/turbine"))
 setenv("MODULES_FOR_BUILD", "python/3.6")
 setenv("DEFAULT_R_MODULE", "R/3.5.2")
 
+ -- Needed to run swift-t out-of-the-box
+prepend_path("LD_PRELOAD", "/usr/local/slurm/lib/libslurm.so")
+append_path("PATH", pathJoin(base,"swift-t-install/stc/bin"))
+
 if (mode() == "load") then
     LmodMessage("[+] Loading  ", app, version, " ...")
 end
