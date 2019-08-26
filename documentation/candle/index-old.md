@@ -2,7 +2,7 @@
 bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
 title: Introduction to using CANDLE on Biowulf
 ---
-**This site is old; please update your bookmark to [https://cbiit.github.com/sdsi/candle](https://cbiit.github.com/sdsi/candle)!**
+# This site is old; please update your bookmark to [https://cbiit.github.com/sdsi/candle](https://cbiit.github.com/sdsi/candle)!
 
 ## What is CANDLE?
 
