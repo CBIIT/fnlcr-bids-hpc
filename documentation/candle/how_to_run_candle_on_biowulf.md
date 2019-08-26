@@ -2,6 +2,8 @@
 bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
 title: How to run CANDLE on Biowulf
 ---
+**This site is old; please update your bookmark to [https://cbiit.github.com/sdsi/candle](https://cbiit.github.com/sdsi/candle)!**
+
 This page will (1) show you how to run a sample job using CANDLE and (2) indicate what needs to be modified in order to run your own job using CANDLE.
 
 ## Step (1): Set up your environment

@@ -2,6 +2,8 @@
 bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
 title: CANDLE on Biowulf
 ---
+**This site is old; please update your bookmark to [https://cbiit.github.com/sdsi/candle](https://cbiit.github.com/sdsi/candle)!**
+
 There are three pages in this documentation for using CANDLE on Biowulf:
 
 1. [How to run CANDLE on Biowulf](https://cbiit.github.io/fnlcr-bids-hpc/documentation/candle/how_to_run_candle_on_biowulf): Go here first to run working examples/templates in order to get a feel for how things work

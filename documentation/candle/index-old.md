@@ -2,6 +2,8 @@
 bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
 title: Introduction to using CANDLE on Biowulf
 ---
+**This site is old; please update your bookmark to [https://cbiit.github.com/sdsi/candle](https://cbiit.github.com/sdsi/candle)!**
+
 ## What is CANDLE?
 
 CANDLE is a software package primarily used to perform the crucial step of hyperparameter optimization for developing deep learning models.  In a nutshell, when you are developing a deep learning model, a significant amount of computation time is spent fitting the "weights" or "parameters" to the model you have chosen.  But how do you choose a model in the first place?  You must first decide on the *type* of model you'd like to try (such as a neural network; choosing the *type* of model can be an art in its own right), and then you need to choose the best "settings" or "hyperparameters" that concretely define the model itself (such as the number of layers in a neural network).  The process of hyperparameter optimization helps you select the best set of hyperparameters to try, e.g., the set that produces returns the lowest loss value for a set number of iterations (or "epochs") of the algorithm that optimizes the *weights*.

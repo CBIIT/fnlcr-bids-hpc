@@ -2,6 +2,8 @@
 bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
 title: How to make your code CANDLE-compliant
 ---
+**This site is old; please update your bookmark to [https://cbiit.github.com/sdsi/candle](https://cbiit.github.com/sdsi/candle)!**
+
 This page will show you how to make your Python* script CANDLE-compliant.
 
 We assume that your code already runs successfully as a standalone script on Biowulf.  For help with this, reach out to us at the contact information at the bottom of this page.

@@ -2,6 +2,8 @@
 bigimg: "/img/FNL_ATRF_Pano_4x10.jpg"
 title: How to modify the CANDLE templates
 ---
+**This site is old; please update your bookmark to [https://cbiit.github.com/sdsi/candle](https://cbiit.github.com/sdsi/candle)!**
+
 The CANDLE templates [submit_candle_job.sh](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/submit_candle_job.sh) and [run_without_candle.sh](https://github.com/ECP-CANDLE/Supervisor/blob/fnlcr/templates/run_without_candle.sh) run as-is as examples on the MNIST dataset.  This page will show you how to modify these template scripts for your own use.
 
 ## How to modify `submit_candle_job.sh` for your own use
